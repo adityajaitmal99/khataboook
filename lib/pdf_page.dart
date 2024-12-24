@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../helper/pdf_helper.dart';
 import '../helper/pdf_invoice_helper.dart';
-import '../main.dart';
 import '../model/customer.dart';
 import '../model/invoice.dart';
 import '../model/supplier.dart';
@@ -28,7 +27,7 @@ class _PdfPageState extends State<PdfPage> {
   final _itemVatController = TextEditingController();
 
   List<InvoiceItem> items = [];
-  bool isItemFormVisible = false;  // To toggle item input fields visibility
+  bool isItemFormVisible = false;
 
   @override
   void dispose() {
@@ -44,87 +43,50 @@ class _PdfPageState extends State<PdfPage> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color.fromARGB(66, 196, 194, 194),
-    appBar: AppBar(
-      centerTitle: true,
-    ),
-    body: SingleChildScrollView( // Make the content scrollable
-      padding: const EdgeInsets.all(32),
-      child: Center(
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.blue.shade50,
+      appBar: AppBar(
+        title: const Text('Generate Invoice'),
+        backgroundColor: Colors.blue,
+        elevation: 4,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const TitleWidget(
               icon: Icons.picture_as_pdf,
               text: 'Generate Invoice',
+              iconColor: Colors.blue,
             ),
-            const SizedBox(height: 48),
+            const SizedBox(height: 32),
             Form(
               key: _formKey,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Supplier Details
-                  TextFormField(
-                    controller: _supplierNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Supplier Name',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter supplier name';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _supplierAddressController,
-                    decoration: const InputDecoration(
-                      labelText: 'Supplier Address',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter supplier address';
-                      }
-                      return null;
-                    },
-                  ),
-                  // Customer Details
-                  TextFormField(
-                    controller: _customerNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Customer Name',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter customer name';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _customerAddressController,
-                    decoration: const InputDecoration(
-                      labelText: 'Customer Address',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter customer address';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Toggle Item Input Form Visibility
+                  _buildSectionTitle('Supplier Details'),
+                  _buildTextField(_supplierNameController, 'Supplier Name'),
+                  _buildTextField(_supplierAddressController, 'Supplier Address'),
+                  const SizedBox(height: 16),
+                  _buildSectionTitle('Customer Details'),
+                  _buildTextField(_customerNameController, 'Customer Name'),
+                  _buildTextField(_customerAddressController, 'Customer Address'),
+                  const SizedBox(height: 16),
+                  _buildSectionTitle('Item Details'),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Item Details'),
+                      const Text(
+                        'Add Item',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
                       IconButton(
-                        icon: Icon(isItemFormVisible
-                            ? Icons.add
-                            : Icons.add),
+                        icon: Icon(
+                          isItemFormVisible ? Icons.remove_circle : Icons.add_circle,
+                          color: Colors.blue.shade700,
+                        ),
                         onPressed: () {
                           setState(() {
                             isItemFormVisible = !isItemFormVisible;
@@ -134,35 +96,11 @@ class _PdfPageState extends State<PdfPage> {
                     ],
                   ),
                   if (isItemFormVisible) ...[
-                    // Item Details (Add Item Inputs)
-                    TextFormField(
-                      controller: _itemDescriptionController,
-                      decoration: const InputDecoration(
-                        labelText: 'Item Description',
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _itemQuantityController,
-                      decoration: const InputDecoration(
-                        labelText: 'Quantity',
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    TextFormField(
-                      controller: _itemUnitPriceController,
-                      decoration: const InputDecoration(
-                        labelText: 'Unit Price',
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    TextFormField(
-                      controller: _itemVatController,
-                      decoration: const InputDecoration(
-                        labelText: 'VAT (%)',
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 16),
+                    _buildTextField(_itemDescriptionController, 'Item Description'),
+                    _buildTextField(_itemQuantityController, 'Quantity', keyboardType: TextInputType.number),
+                    _buildTextField(_itemUnitPriceController, 'Unit Price', keyboardType: TextInputType.number),
+                    _buildTextField(_itemVatController, 'VAT (%)', keyboardType: TextInputType.number),
+                    const SizedBox(height: 8),
                     ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState?.validate() ?? false) {
@@ -182,26 +120,28 @@ class _PdfPageState extends State<PdfPage> {
                           });
                         }
                       },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade700,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
                       child: const Text('Add Item'),
                     ),
                   ],
-
-                  // Display Added Items with a Delete Option
                   const SizedBox(height: 16),
-                  if (items.isNotEmpty)
+                  if (items.isNotEmpty) ...[
+                    _buildSectionTitle('Added Items'),
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Added Items:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        ...items.asMap().entries.map(
-                              (entry) => ListTile(
-                            title: Text(entry.value.description),
-                            subtitle: Text('Qty: ${entry.value.quantity}, Price: ${entry.value.unitPrice}, VAT: ${entry.value.vat}%'),
+                      children: items.asMap().entries.map((entry) {
+                        final item = entry.value;
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          child: ListTile(
+                            title: Text(item.description),
+                            subtitle: Text('Qty: ${item.quantity}, Price: ${item.unitPrice}, VAT: ${item.vat}%'),
                             trailing: IconButton(
-                              icon: const Icon(Icons.delete),
+                              icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () {
                                 setState(() {
                                   items.removeAt(entry.key);
@@ -209,41 +149,26 @@ class _PdfPageState extends State<PdfPage> {
                               },
                             ),
                           ),
-                        )
-                      ],
+                        );
+                      }).toList(),
                     ),
-
-                  // Generate PDF Button
-                  const SizedBox(height: 16),
-                  ButtonWidget(
-                    text: 'Generate PDF',
-                    onClicked: () async {
-                      final date = DateTime.now();
-                      final dueDate = date.add(const Duration(days: 7));
-
-                      final invoice = Invoice(
-                        supplier: Supplier(
-                          name: _supplierNameController.text,
-                          address: _supplierAddressController.text,
-                          paymentInfo: '', // Optional field, empty if not needed
+                  ],
+                  const SizedBox(height: 24),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: _generatePdf,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade700,
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        customer: Customer(
-                          name: _customerNameController.text,
-                          address: _customerAddressController.text,
-                        ),
-                        info: InvoiceInfo(
-                          date: date,
-                          dueDate: dueDate,
-                          description: 'Invoice Description',
-                          number: '${DateTime.now().year}-9999',
-                        ),
-                        items: items,
-                      );
-
-                      final pdfFile = await PdfInvoicePdfHelper.generate(invoice);
-
-                      PdfHelper.openFile(pdfFile);
-                    },
+                      ),
+                      child: const Text(
+                        'Generate PDF',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -251,6 +176,67 @@ class _PdfPageState extends State<PdfPage> {
           ],
         ),
       ),
-    ),
-  );
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label,
+      {TextInputType keyboardType = TextInputType.text}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter $label';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        title,
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+      ),
+    );
+  }
+
+  Future<void> _generatePdf() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      final date = DateTime.now();
+      final dueDate = date.add(const Duration(days: 7));
+
+      final invoice = Invoice(
+        supplier: Supplier(
+          name: _supplierNameController.text,
+          address: _supplierAddressController.text, paymentInfo: '',
+        ),
+        customer: Customer(
+          name: _customerNameController.text,
+          address: _customerAddressController.text,
+        ),
+        info: InvoiceInfo(
+          date: date,
+          dueDate: dueDate,
+          description: 'Invoice Description',
+          number: '${DateTime.now().year}-9999',
+        ),
+        items: items,
+      );
+
+      final pdfFile = await PdfInvoicePdfHelper.generate(invoice);
+      PdfHelper.openFile(pdfFile);
+    }
+  }
 }

@@ -7,7 +7,7 @@ class TitleWidget extends StatelessWidget {
   const TitleWidget({
     Key? key,
     required this.icon,
-    required this.text,
+    required this.text, required MaterialColor iconColor,
   }) : super(key: key);
 
   @override
