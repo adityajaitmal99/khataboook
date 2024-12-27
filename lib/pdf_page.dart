@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../helper/pdf_helper.dart';
 import '../helper/pdf_invoice_helper.dart';
 import '../model/customer.dart';
@@ -20,25 +19,24 @@ class _PdfPageState extends State<PdfPage> {
   final _supplierNameController = TextEditingController();
   final _supplierAddressController = TextEditingController();
   final _customerNameController = TextEditingController();
-  final _customerAddressController = TextEditingController();
+  final _customerPhoneController = TextEditingController();
   final _itemDescriptionController = TextEditingController();
   final _itemQuantityController = TextEditingController();
   final _itemUnitPriceController = TextEditingController();
-  final _itemVatController = TextEditingController();
 
   List<InvoiceItem> items = [];
   bool isItemFormVisible = false;
+  int invoiceNumber = 1;
 
   @override
   void dispose() {
     _supplierNameController.dispose();
     _supplierAddressController.dispose();
     _customerNameController.dispose();
-    _customerAddressController.dispose();
+    _customerPhoneController.dispose();
     _itemDescriptionController.dispose();
     _itemQuantityController.dispose();
     _itemUnitPriceController.dispose();
-    _itemVatController.dispose();
     super.dispose();
   }
 
@@ -72,7 +70,7 @@ class _PdfPageState extends State<PdfPage> {
                   const SizedBox(height: 16),
                   _buildSectionTitle('Customer Details'),
                   _buildTextField(_customerNameController, 'Customer Name'),
-                  _buildTextField(_customerAddressController, 'Customer Address'),
+                  _buildTextField(_customerPhoneController, 'Customer Phone', keyboardType: TextInputType.phone),
                   const SizedBox(height: 16),
                   _buildSectionTitle('Item Details'),
                   Row(
@@ -99,7 +97,6 @@ class _PdfPageState extends State<PdfPage> {
                     _buildTextField(_itemDescriptionController, 'Item Description'),
                     _buildTextField(_itemQuantityController, 'Quantity', keyboardType: TextInputType.number),
                     _buildTextField(_itemUnitPriceController, 'Unit Price', keyboardType: TextInputType.number),
-                    _buildTextField(_itemVatController, 'VAT (%)', keyboardType: TextInputType.number),
                     const SizedBox(height: 8),
                     ElevatedButton(
                       onPressed: () {
@@ -108,15 +105,13 @@ class _PdfPageState extends State<PdfPage> {
                             description: _itemDescriptionController.text,
                             date: DateTime.now(),
                             quantity: int.tryParse(_itemQuantityController.text) ?? 1,
-                            unitPrice: double.tryParse(_itemUnitPriceController.text) ?? 0.0,
-                            vat: double.tryParse(_itemVatController.text) ?? 0.0,
+                            unitPrice: double.tryParse(_itemUnitPriceController.text) ?? 0.0, vat: 0.0,
                           );
                           setState(() {
                             items.add(item);
                             _itemDescriptionController.clear();
                             _itemQuantityController.clear();
                             _itemUnitPriceController.clear();
-                            _itemVatController.clear();
                           });
                         }
                       },
@@ -139,7 +134,7 @@ class _PdfPageState extends State<PdfPage> {
                           margin: const EdgeInsets.symmetric(vertical: 8),
                           child: ListTile(
                             title: Text(item.description),
-                            subtitle: Text('Qty: ${item.quantity}, Price: ${item.unitPrice}, VAT: ${item.vat}%'),
+                            subtitle: Text('Qty: ${item.quantity}, Price: ${item.unitPrice}'),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () {
@@ -215,22 +210,20 @@ class _PdfPageState extends State<PdfPage> {
   Future<void> _generatePdf() async {
     if (_formKey.currentState?.validate() ?? false) {
       final date = DateTime.now();
-      final dueDate = date.add(const Duration(days: 7));
-
       final invoice = Invoice(
         supplier: Supplier(
           name: _supplierNameController.text,
-          address: _supplierAddressController.text, paymentInfo: '',
+          address: _supplierAddressController.text,
+          paymentInfo: '',
         ),
         customer: Customer(
           name: _customerNameController.text,
-          address: _customerAddressController.text,
+          phone: _customerPhoneController.text, address: '',
         ),
         info: InvoiceInfo(
           date: date,
-          dueDate: dueDate,
           description: 'Invoice Description',
-          number: '${DateTime.now().year}-9999',
+          number: 'INV-${invoiceNumber++}', dueDate: date.add(const Duration(days: 7)),
         ),
         items: items,
       );

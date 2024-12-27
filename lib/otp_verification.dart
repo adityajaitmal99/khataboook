@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'I10n/app_locale.dart'; // Import for translations
 import 'package:khataboook/bottom%20navigation/parties_screen.dart'; // Import PartiesScreen
 
 class OTPVerificationPage extends StatefulWidget {
   final String languageCode;
-  const OTPVerificationPage({super.key, required this.languageCode});
+  final String phoneNumber;
+
+  const OTPVerificationPage({
+    super.key,
+    required this.languageCode,
+    required this.phoneNumber, required String verificationId,
+  });
 
   @override
   _OTPVerificationPageState createState() => _OTPVerificationPageState();
@@ -16,10 +23,14 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
   List.generate(6, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
 
+  String? _verificationId; // Holds the verification ID
+  bool _isVerifying = false; // Shows loading state
+
   @override
   void initState() {
     super.initState();
     locale = AppLocale.getLocale(widget.languageCode);
+    _sendOTP(); // Send OTP when the page loads
   }
 
   @override
@@ -33,39 +44,83 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
     super.dispose();
   }
 
-  /// Combines OTP fields into a single string
   String get _otp {
     return _otpControllers.map((controller) => controller.text).join();
   }
 
-  /// OTP Verification Logic
-  void _verifyOTP() {
-    if (_otp.length == 6) {
-      // Simulate OTP Verification Success
-      print("Entered OTP: $_otp");
-
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(locale['otpVerificationSuccess'] ?? 'OTP Verified Successfully!'),
-          backgroundColor: Colors.green,
-        ),
+  /// Sends OTP to the given phone number
+  Future<void> _sendOTP() async {
+    try {
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: widget.phoneNumber,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          // Automatically verifies the OTP and logs in the user
+          await FirebaseAuth.instance.signInWithCredential(credential);
+          _onVerificationSuccess();
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          _showSnackbar(e.message ?? "Verification failed");
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          setState(() {
+            _verificationId = verificationId;
+          });
+          _showSnackbar("OTP sent successfully");
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          _verificationId = verificationId;
+        },
       );
-
-      // Navigate to PartiesScreen after OTP verification
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => PartiesScreen(languageCode: widget.languageCode)),
-      );
-    } else {
-      // Show error for invalid OTP
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(locale['otpVerificationFailed'] ?? 'Invalid OTP. Please try again.'),
-          backgroundColor: Colors.red,
-        ),
-      );
+    } catch (e) {
+      _showSnackbar("Error sending OTP: $e");
     }
+  }
+
+  /// Verifies the entered OTP
+  Future<void> _verifyOTP() async {
+    if (_otp.length != 6 || _verificationId == null) {
+      _showSnackbar(locale['otpVerificationFailed'] ?? 'Invalid OTP. Please try again.');
+      return;
+    }
+
+    setState(() {
+      _isVerifying = true;
+    });
+
+    try {
+      final credential = PhoneAuthProvider.credential(
+        verificationId: _verificationId!,
+        smsCode: _otp,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      _onVerificationSuccess();
+    } catch (e) {
+      _showSnackbar(locale['otpVerificationFailed'] ?? 'Invalid OTP. Please try again.');
+    } finally {
+      setState(() {
+        _isVerifying = false;
+      });
+    }
+  }
+
+  void _onVerificationSuccess() {
+    _showSnackbar(locale['otpVerificationSuccess'] ?? 'OTP Verified Successfully!', isSuccess: true);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PartiesScreen(languageCode: widget.languageCode),
+      ),
+    );
+  }
+
+  void _showSnackbar(String message, {bool isSuccess = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isSuccess ? Colors.green : Colors.red,
+      ),
+    );
   }
 
   @override
@@ -77,7 +132,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
         title: Text(
-          locale['otpPageTitle'] ?? 'OTP Verification', // Title localization
+          locale['otpPageTitle'] ?? 'OTP Verification',
           style: const TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
@@ -91,29 +146,18 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 30),
-
-            // Lock Icon
             const Icon(
               Icons.lock_outline_rounded,
               size: 100,
               color: Colors.blueAccent,
             ),
-
             const SizedBox(height: 20),
-
-            // Subtitle
             Text(
               locale['otpSent'] ?? 'An OTP has been sent to your phone.',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black54,
-              ),
+              style: const TextStyle(fontSize: 16, color: Colors.black54),
             ),
-
             const SizedBox(height: 30),
-
-            // OTP Input Fields
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: List.generate(6, (index) {
@@ -126,48 +170,33 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                     keyboardType: TextInputType.number,
                     maxLength: 1,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
                     decoration: InputDecoration(
                       counterText: '',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(
-                          color: Colors.grey,
-                        ),
+                        borderSide: const BorderSide(color: Colors.grey),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(
-                          color: Colors.blueAccent,
-                        ),
+                        borderSide: const BorderSide(color: Colors.blueAccent),
                       ),
                     ),
                     onChanged: (value) {
-                      if (value.isNotEmpty) {
-                        if (index < 5) {
-                          FocusScope.of(context)
-                              .requestFocus(_focusNodes[index + 1]);
-                        } else {
-                          FocusScope.of(context).unfocus();
-                        }
+                      if (value.isNotEmpty && index < 5) {
+                        FocusScope.of(context).requestFocus(_focusNodes[index + 1]);
                       } else if (value.isEmpty && index > 0) {
-                        FocusScope.of(context)
-                            .requestFocus(_focusNodes[index - 1]);
+                        FocusScope.of(context).requestFocus(_focusNodes[index - 1]);
                       }
                     },
                   ),
                 );
               }),
             ),
-
             const SizedBox(height: 30),
-
-            // Verify OTP Button
-            SizedBox(
+            _isVerifying
+                ? const CircularProgressIndicator()
+                : SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _verifyOTP,
@@ -180,35 +209,16 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                 ),
                 child: Text(
                   locale['verifyOtp'] ?? 'Verify OTP',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: const TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
-
             const SizedBox(height: 20),
-
-            // Resend OTP
             TextButton(
-              onPressed: () {
-                // Logic for resending OTP
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("OTP resent successfully.....!"),
-                    backgroundColor: Colors.orangeAccent,
-                  ),
-                );
-              },
+              onPressed: _sendOTP,
               child: Text(
                 locale['resendOtp'] ?? 'Resend OTP',
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.blueAccent,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: const TextStyle(fontSize: 16, color: Colors.blueAccent, fontWeight: FontWeight.w500),
               ),
             ),
           ],

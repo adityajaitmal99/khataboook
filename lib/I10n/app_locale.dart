@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class AppLocale {
   // Common text keys
   static const String title = 'title';
@@ -31,7 +33,7 @@ class AppLocale {
   static const String remind = 'remind';
   static const String filter = 'filter';
   static const String totalBalance = 'totalBalance';
-  static const String noCustomers = 'nocustomer';
+  static const String noCustomers = 'noCustomers';
   static const String recentTransactions = 'recentTransactions';
 
   // Additional Keys for Bills, Items, and More screens
@@ -81,6 +83,7 @@ class AppLocale {
     filter: 'Filter',
     totalBalance: 'Total Balance',
     recentTransactions: 'Recent Transactions',
+    noCustomers: 'No Customers',
 
     // Bills, Items, More
     bills: 'Bills',
@@ -130,7 +133,7 @@ class AppLocale {
     filter: 'फिल्टर',
     totalBalance: 'एकूण शिल्लक',
     recentTransactions: 'अलीकडील व्यवहार',
-    noCustomers: 'ग्राहक नाहीत',
+    noCustomers: 'कोणतेही ग्राहक नाहीत',
 
     // Bills, Items, More
     bills: 'बिल्स',

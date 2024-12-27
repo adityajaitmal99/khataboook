@@ -4,6 +4,6 @@ class Customer {
 
   const Customer({
     required this.name,
-    required this.address,
+    required this.address, required String phone,
   });
 }

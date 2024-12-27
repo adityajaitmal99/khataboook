@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'I10n/app_locale.dart';
-import 'otp_verification.dart'; // Import for translations
+import 'package:firebase_auth/firebase_auth.dart';
+import 'I10n/app_locale.dart'; // Localization
+import 'otp_verification.dart'; // OTP Verification Page
 
 class LoginPage extends StatefulWidget {
   final String languageCode; // Language code passed dynamically
@@ -11,7 +12,11 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  late Map<String, dynamic> locale; // To hold translations dynamically
+  late Map<String, String> locale; // To hold translations dynamically
+  final TextEditingController _phoneController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -20,7 +25,74 @@ class _LoginPageState extends State<LoginPage> {
     locale = AppLocale.getLocale(widget.languageCode);
   }
 
-  final TextEditingController _phoneController = TextEditingController();
+  /// Sends OTP to the entered phone number
+  Future<void> _sendOTP() async {
+    final String phoneNumber = '+91${_phoneController.text.trim()}';
+
+    if (_phoneController.text.isEmpty || _phoneController.text.length != 10) {
+      _showSnackbar(locale['invalidPhoneNumber'] ?? 'Enter a valid phone number');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _auth.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          // This callback is triggered for auto-verification.
+          await _auth.signInWithCredential(credential);
+          _showSnackbar(locale['otpAutoVerified'] ?? 'OTP auto-verified successfully!');
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OTPVerificationPage(
+                languageCode: widget.languageCode,
+                phoneNumber: phoneNumber, verificationId: '',
+              ),
+            ),
+          );
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          _showSnackbar(e.message ?? 'Failed to send OTP');
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          _showSnackbar(locale['otpSent'] ?? 'OTP sent successfully!');
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OTPVerificationPage(
+                languageCode: widget.languageCode,
+                phoneNumber: phoneNumber,
+                verificationId: verificationId,
+              ),
+            ),
+          );
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          _showSnackbar(locale['otpTimeout'] ?? 'OTP request timed out. Try again.');
+        },
+      );
+    } catch (e) {
+      _showSnackbar(locale['otpError'] ?? 'Error sending OTP. Please try again.');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  /// Displays a snackbar with the given message
+  void _showSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,16 +116,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Subtitle Text
-          /*  Center(
-              child: Text(
-                locale[AppLocale.fasterAndSecure] ?? '',
-                style: const TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-            ),*/
             const SizedBox(height: 30),
-
-            // Phone Number Input with Country Code
             Row(
               children: [
                 Container(
@@ -79,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
                     keyboardType: TextInputType.phone,
                     style: const TextStyle(fontSize: 16),
                     decoration: InputDecoration(
-                      hintText: locale[AppLocale.phoneNumber] ?? '',
+                      hintText: locale['phoneNumber'] ?? 'Enter phone number',
                       hintStyle: TextStyle(color: Colors.grey.shade500),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
                       border: OutlineInputBorder(
@@ -101,21 +164,13 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ],
             ),
-
             const Spacer(),
-
-            // Submit Button
-            SizedBox(
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => OTPVerificationPage(languageCode: widget.languageCode),
-                    ),
-                  );// Handle OTP Logic Here
-                },
+                onPressed: _sendOTP,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueAccent,
                   padding: const EdgeInsets.symmetric(vertical: 15),
@@ -124,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 child: Text(
-                  locale[AppLocale.getOtp] ?? '',
+                  locale['getOtp'] ?? 'Get OTP',
                   style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),

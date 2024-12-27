@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
- // Import the PDF generation page
+import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core package
 import 'package:flutter_localizations/flutter_localizations.dart'; // Import the necessary localizations package
+import 'package:khataboook/bottom%20navigation/parties_screen.dart';
 import 'I10n/language_selection.dart'; // Import language selection page
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  await Firebase.initializeApp();
+
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -34,8 +39,7 @@ class MyApp extends StatelessWidget {
         GlobalMaterialLocalizations.delegate, // Localization delegate for material components
         GlobalWidgetsLocalizations.delegate, // Localization delegate for widget components
       ],
-      home: const LanguageSelectionPage(), // Home page is language selection
+      home: const PartiesScreen(languageCode: 'en'), // Home page is language selection
     );
   }
 }
-
