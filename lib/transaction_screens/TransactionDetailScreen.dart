@@ -1,25 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:khataboook/transaction_screens/You%20Got%20screen.dart';
-
-
-import 'TransactionEntry.dart';
+import '../I10n/app_locale.dart';
+import '../model/TransactionDetails.dart';
+import 'package:intl/intl.dart';
+import 'You Got screen.dart';
 import 'You gave scren.dart';
 
-class TransactionDetailScreen extends StatelessWidget {
+class TransactionDetailScreen extends StatefulWidget {
   final String name;
   final String number;
   final String timeAgo;
-  final String amount;
   final Color amountColor;
+  final String languageCode;
+  final String? address; // New address parameter
 
   const TransactionDetailScreen({
     Key? key,
     required this.name,
     required this.number,
     required this.timeAgo,
-    required this.amount,
-    required this.amountColor, required String languageCode,
+    required this.amountColor,
+    required this.languageCode,
+    this.address, // Optional address parameter
   }) : super(key: key);
+
+  @override
+  State<TransactionDetailScreen> createState() => _TransactionDetailScreenState();
+}
+
+class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
+  List<TransactionDetails> transactions = [];
 
   @override
   Widget build(BuildContext context) {
@@ -27,107 +36,168 @@ class TransactionDetailScreen extends StatelessWidget {
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         title: Text(
-          'Transaction Details',
-          style: TextStyle(color: Colors.black),
+          AppLocale.getText('transactionDetails', widget.languageCode),
+          style: const TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.blue,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top section with balance and customer info
             Container(
               padding: const EdgeInsets.all(16.0),
+              width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(8.0),
+                borderRadius: BorderRadius.circular(12.0),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.2),
                     spreadRadius: 2,
                     blurRadius: 5,
-                    offset: Offset(0, 3),
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Displaying name and number
                   Text(
-                    name,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    widget.name,
+                    style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    number,
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'You will get',
-                    style: TextStyle(fontSize: 18, color: Colors.black54),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    amount,
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: amountColor,
+                    widget.number,
+                    style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.picture_as_pdf, color: Colors.blue),
-                        onPressed: () {},
+                  if (widget.address != null && widget.address!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.address!,
+                      style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey
                       ),
-                      IconButton(
-                        icon: Icon(Icons.payment, color: Colors.blue),
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.notifications, color: Colors.blue),
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.sms, color: Colors.blue),
-                        onPressed: () {},
-                      ),
-                    ],
+                    ),
+                  ],
+                  const SizedBox(height: 8),
+                  Text(
+                    AppLocale.getText('youWillGet', widget.languageCode),
+                    style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.black54
+                    ),
                   ),
+                  const SizedBox(height: 8),
                 ],
               ),
             ),
+            const SizedBox(height: 24),
+
+            Text(
+              AppLocale.getText('Transactions:-', widget.languageCode),
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
             const SizedBox(height: 16),
+
             Expanded(
-              child: ListView(
-                children: [
-                  TransactionEntry(
-                    dateTime: "14 Nov 24 - 04:01 PM",
-                    balance: "₹20",
-                    youGave: "₹100",
-                    youGot: "₹80",
-                  ),
-                  TransactionEntry(
-                    dateTime: "14 Nov 24 - 04:01 PM",
-                    balance: "₹20",
-                    youGave: "₹100",
-                    youGot: null,
-                  ),
-                ],
+              child: ListView.builder(
+                itemCount: transactions.length,
+                itemBuilder: (context, index) {
+                  final transaction = transactions[index];
+                  final color = transaction.isGave ? Colors.red.shade700 : Colors.green.shade700;
+                  final amountPrefix = transaction.isGave ? '- ₹' : '+ ₹';
+
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 12.0),
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(16),
+                      title: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: color.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              '$amountPrefix${transaction.amount}',
+                              style: TextStyle(
+                                color: color,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              transaction.details,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              DateFormat('dd/MM/yyyy').format(transaction.date),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      trailing: transaction.attachedBill != null
+                          ? Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.attachment,
+                          color: Colors.blue,
+                        ),
+                      )
+                          : null,
+                    ),
+                  );
+                },
               ),
             ),
           ],
         ),
       ),
+
       bottomNavigationBar: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
@@ -138,7 +208,7 @@ class TransactionDetailScreen extends StatelessWidget {
               color: Colors.grey.withOpacity(0.5),
               spreadRadius: -2,
               blurRadius: 8,
-              offset: Offset(0, -3), // Only show shadow on the top
+              offset: const Offset(0, -3),
             ),
           ],
         ),
@@ -148,45 +218,69 @@ class TransactionDetailScreen extends StatelessWidget {
             Expanded(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  backgroundColor: Colors.red.shade700,
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: BorderRadius.circular(12.0),
                   ),
                 ),
-                onPressed: () {
-                  // Navigate to the OTP Verification screen
-                  Navigator.push(
+                onPressed: () async {
+                  final result = await Navigator.push<TransactionDetails>(
                     context,
-                    MaterialPageRoute(builder: (context) =>  TransactionScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => TransactionScreen(
+                        name: widget.name,
+                        isGave: true,
+                      ),
+                    ),
                   );
+                  if (result != null) {
+                    setState(() {
+                      transactions.add(result);
+                    });
+                  }
                 },
                 child: Text(
-                  'YOU GAVE ₹',
-                  style: TextStyle(color: Colors.white),
+                  AppLocale.getText('youGave', widget.languageCode),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  backgroundColor: Colors.green.shade700,
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: BorderRadius.circular(12.0),
                   ),
                 ),
-                onPressed: () {
-                  // Navigate to the OTP Verification screen
-                  Navigator.push(
+                onPressed: () async {
+                  final result = await Navigator.push<TransactionDetails>(
                     context,
-                    MaterialPageRoute(builder: (context) =>  TransactionScreenn()),
+                    MaterialPageRoute(
+                      builder: (context) => TransactionScreenn(
+                        name: widget.name,
+                        isGave: false,
+                      ),
+                    ),
                   );
+                  if (result != null) {
+                    setState(() {
+                      transactions.add(result);
+                    });
+                  }
                 },
                 child: Text(
-                  'YOU GOT ₹',
-                  style: TextStyle(color: Colors.white),
+                  AppLocale.getText('youGot', widget.languageCode),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
@@ -196,4 +290,3 @@ class TransactionDetailScreen extends StatelessWidget {
     );
   }
 }
-

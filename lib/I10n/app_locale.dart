@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class AppLocale {
   // Common text keys
   static const String title = 'title';
@@ -14,6 +12,7 @@ class AppLocale {
   static const String otpSent = 'otpSent';
   static const String verifyOtp = 'verifyOtp';
   static const String resendOtp = 'resendOtp';
+  static const String signInWithGoogle = 'signInWithGoogle';
 
   // OTP Page keys
   static const String otpPageTitle = 'otpPageTitle';
@@ -29,12 +28,24 @@ class AppLocale {
   static const String youWillGive = 'youWillGive';
   static const String youWillGet = 'youWillGet';
   static const String qrCollections = 'qrCollections';
-  static const String viewReports = 'viewReports';
+  static const String viewReports = 'viewReports'; // keep this for Parties screen
   static const String remind = 'remind';
   static const String filter = 'filter';
   static const String totalBalance = 'totalBalance';
   static const String noCustomers = 'noCustomers';
   static const String recentTransactions = 'recentTransactions';
+
+  // Bills Screen Keys (Billing-related texts)
+  static const String monthlySales = 'monthlySales';
+  static const String monthlyPurchases = 'monthlyPurchases';
+  static const String todayIn = 'todayIn';
+  static const String todayOut = 'todayOut';
+  static const String sale = 'sale';
+  static const String purchase = 'purchase';
+  static const String expense = 'expense';
+  static const String addBill = 'addBill';
+  static const String searchForTransactions = 'searchForTransactions';
+  static const String noBillsAvailable = 'noBillsAvailable';
 
   // Additional Keys for Bills, Items, and More screens
   static const String bills = 'bills';
@@ -50,10 +61,44 @@ class AppLocale {
   static const String updateProfile = 'updateProfile';
   static const String changePassword = 'changePassword';
 
+  // New Keys for Items Screen
+  static const String stockManagement = 'stockManagement';
+  static const String addProduct = 'addProduct';
+  static const String salePrice = 'salePrice';
+  static const String purchasePrice = 'purchasePrice';
+  static const String openingStock = 'openingStock';
+  static const String lowStockAlert = 'lowStockAlert';
+  static const String date = 'date';
+  static const String stock = 'stock';
+  static const String inStockStatus = 'inStockStatus'; // Renamed from 'in'
+  static const String outOfStockStatus = 'outOfStockStatus'; // Renamed from 'out'
+  static const String increaseStock = 'increaseStock';
+  static const String decreaseStock = 'decreaseStock';
+  static const String searchItems = 'searchItems'; // Added this key
+  static const String viewItemsReports = 'viewItemsReports'; // Renamed from 'viewReports'
+
+  // New Keys for More Screen
+  static const String aboutUs = 'aboutUs';
+  static const String termsConditions = 'termsConditions';
+  static const String privacyPolicy = 'privacyPolicy';
+  static const String faq = 'faq';
+  static const String support = 'support';
+  static const String contactUs = 'contactUs';
+
+  static const String address = 'address';
+  static const String enterAddress = 'enterAddress';
+  static const String addressRequired = 'addressRequired';
+  static const String mobileNumber = 'mobileNumber';
+  static const String partyName = 'partyName';
+  static const String  addParty = 'addParty';
+
+  static const String  nameRequired = 'Please Enter party name';
+  static const String  phoneRequired = 'Please Enter phone number';
+  static const String  invalidPhone = 'Mobile number is not valid';
   /// English Translations (Default Language)
   static const Map<String, String> EN = {
     // Common
-    title: 'Welcome to Khatabook',
+    title: 'Softgrid Billing-App',
     welcomeText: 'Track your daily expenses easily.',
     getStarted: 'Get Started',
     fastestAndSecure: 'Fastest and Secure',
@@ -67,6 +112,7 @@ class AppLocale {
     resendOtp: 'Resend OTP',
     otpPageTitle: 'OTP Verification',
     otpVerificationSuccess: 'OTP verified successfully!',
+    signInWithGoogle: 'Sign in with Google',
 
     // Parties Screen
     parties: 'Parties',
@@ -78,7 +124,7 @@ class AppLocale {
     youWillGive: 'You will give',
     youWillGet: 'You will get',
     qrCollections: 'QR Collections',
-    viewReports: 'VIEW REPORTS',
+    viewReports: 'VIEW REPORTS', // Keep for Parties Screen
     remind: 'REMIND',
     filter: 'Filter',
     totalBalance: 'Total Balance',
@@ -90,6 +136,18 @@ class AppLocale {
     items: 'Items',
     more: 'More',
 
+    // Billing Screen
+    monthlySales: 'Monthly Sales',
+    monthlyPurchases: 'Monthly Purchases',
+    todayIn: "Today's IN",
+    todayOut: "Today's OUT",
+    sale: 'Sale',
+    purchase: 'Purchase',
+    expense: 'Expense',
+    addBill: 'Add Bill',
+    searchForTransactions: 'Search for transactions',
+    noBillsAvailable: 'No bills available',
+
     // Settings, Profile, Notifications
     settings: 'Settings',
     profile: 'Profile',
@@ -98,12 +156,63 @@ class AppLocale {
     logout: 'Logout',
     updateProfile: 'Update Profile',
     changePassword: 'Change Password',
+
+    // Items Screen
+    stockManagement: 'Stock Management',
+    addProduct: 'Add Product',
+    salePrice: 'Sale Price',
+    purchasePrice: 'Purchase Price',
+    openingStock: 'Opening Stock',
+    lowStockAlert: 'Low Stock Alert',
+    date: 'Date',
+    stock: 'Stock',
+    inStockStatus: 'In Stock', // Renamed from 'in'
+    outOfStockStatus: 'Out of Stock', // Renamed from 'out'
+    increaseStock: 'Increase Stock',
+    decreaseStock: 'Decrease Stock',
+    searchItems: 'Search Items', // Added this key
+    viewItemsReports: 'View Reports', // Renamed from 'viewReports'
+
+    // More Screen
+    aboutUs: 'About Us',
+    termsConditions: 'Terms & Conditions',
+    privacyPolicy: 'Privacy Policy',
+    faq: 'FAQ',
+    support: 'Support',
+    contactUs: 'Contact Us',
+
+    address: 'Address',
+    enterAddress: 'Enter Address',
+    addressRequired: 'Address is required',
+    mobileNumber: 'Mobile Number',
+    partyName: 'Party Name',
+    addParty: 'Add Party',
+    phoneRequired: 'Please Enter phone number',
+    invalidPhone: 'Mobile number is not valid',
+    nameRequired: 'Please Enter party name',
+    //transaction detail screen
+    'transactionDetails': 'Transaction Details',
+    'youGave': 'YOU GAVE ₹',
+    'youGot': 'YOU GOT ₹',
+    'attachments': 'Attachments',
+    'downloadPdf': 'Download PDF',
+    'makePayment': 'Make Payment',
+    'sendReminder': 'Send Reminder',
+    'sendMessage': 'Send Message',
+    'addNote': 'Add Note',
+    'enterAmount': 'Enter Amount',
+    'enterDescription': 'Enter Description',
+    'attachBill': 'Attach Bill',
+    'selectDate': 'Select Date',
+    'save': 'Save',
+    'cancel': 'Cancel',
+    'Transactions:-': 'Transactions:-',
   };
 
   /// Marathi Translations
   static const Map<String, String> MR = {
     // Common
-    title: 'खाताबूक मध्ये स्वागत आहे',
+    title: 'सॉफ्टग्रिड बिलिंग-ॲप मध्ये स्वागत आहे',
     welcomeText: 'तुमच्या दैनिक खर्चाचे सहजपणे ट्रॅक करा.',
     getStarted: 'सुरू करा',
     fastestAndSecure: 'सर्वात वेगवान आणि सुरक्षित',
@@ -117,6 +226,7 @@ class AppLocale {
     resendOtp: 'OTP पुन्हा पाठवा',
     otpPageTitle: 'OTP पडताळणी',
     otpVerificationSuccess: 'OTP यशस्वीरित्या पडताळला गेला!',
+    signInWithGoogle: 'गुगलने साइन इन करा',
 
     // Parties Screen
     parties: 'पक्ष',
@@ -128,7 +238,7 @@ class AppLocale {
     youWillGive: 'तुम्ही देणार',
     youWillGet: 'तुम्हाला मिळणार',
     qrCollections: 'QR संग्रह',
-    viewReports: 'अहवाल पाहा',
+    viewReports: 'अहवाल पाहा', // Keep for Parties Screen
     remind: 'आठवण द्या',
     filter: 'फिल्टर',
     totalBalance: 'एकूण शिल्लक',
@@ -140,14 +250,81 @@ class AppLocale {
     items: 'आयटम्स',
     more: 'अधिक',
 
+    // Billing Screen
+    monthlySales: 'मासिक विक्री',
+    monthlyPurchases: 'मासिक खरेदी',
+    todayIn: 'आजचे प्राप्त',
+    todayOut: 'आजचे बाह्य',
+    sale: 'विक्री',
+    purchase: 'खरेदी',
+    expense: 'खर्च',
+    addBill: 'बिल जोडा',
+    searchForTransactions: 'व्यवहार शोधा',
+    noBillsAvailable: 'कोणतेही बिल उपलब्ध नाहीत',
+
     // Settings, Profile, Notifications
     settings: 'सेटिंग्ज',
     profile: 'प्रोफाइल',
-    notifications: 'सूचनाएँ',
+    notifications: 'सूचना',
     language: 'भाषा',
     logout: 'लॉगआउट',
     updateProfile: 'प्रोफाइल अपडेट करा',
     changePassword: 'पासवर्ड बदलें',
+
+    // Items Screen
+    stockManagement: 'स्टॉक व्यवस्थापन',
+    addProduct: 'उत्पादन जोडा',
+    salePrice: 'विक्री किंमत',
+    purchasePrice: 'खरेदी किंमत',
+    openingStock: 'उद्घाटन स्टॉक',
+    lowStockAlert: 'कमी स्टॉक अलर्ट',
+    date: 'तारीख',
+    stock: 'स्टॉक',
+    inStockStatus: 'स्टॉक मध्ये', // Renamed from 'in'
+    outOfStockStatus: 'स्टॉक नाही', // Renamed from 'out'
+    increaseStock: 'स्टॉक वाढवा',
+    decreaseStock: 'स्टॉक कमी करा',
+    searchItems: 'आयटम शोधा', // Added this key
+    viewItemsReports: 'अहवाल पाहा', // Renamed from 'viewReports'
+
+    // More Screen
+    aboutUs: 'आमच्याबद्दल',
+    termsConditions: 'शर्ती आणि अटी',
+    privacyPolicy: 'गोपनीयता धोरण',
+    faq: 'वारंवार विचारलेले प्रश्न',
+    support: 'समर्थन',
+    contactUs: 'आमच्याशी संपर्क करा',
+
+    // Add new address translations
+    address: 'पत्ता',
+    enterAddress: 'पत्ता टाका',
+    addressRequired: 'पत्ता आवश्यक आहे',
+    mobileNumber: 'मोबाइल नंबर',
+    partyName: 'ग्राहक नाव',
+    addParty: 'ग्राहक जोडा',
+    phoneRequired: 'कृपया फोन नंबर प्रविष्ट करा',
+    invalidPhone: 'मोबाइल नंबर वैध नाही',
+    nameRequired: 'कृपया पक्षाचे नाव प्रविष्ट करा',
+
+
+
+    //transaction detail screen
+    'transactionDetails': 'व्यवहार तपशील',
+    'youGave': 'तुम्ही दिले ₹',
+    'youGot': 'तुम्हाला मिळाले ₹',
+    'attachments': 'जोडपत्रे',
+    'downloadPdf': 'पीडीएफ डाउनलोड करा',
+    'makePayment': 'पैसे भरा',
+    'sendReminder': 'स्मरणपत्र पाठवा',
+    'sendMessage': 'संदेश पाठवा',
+    'addNote': 'नोट जोडा',
+    'enterAmount': 'रक्कम टाका',
+    'enterDescription': 'वर्णन टाका',
+    'attachBill': 'बिल जोडा',
+    'selectDate': 'तारीख निवडा',
+    'save': 'जतन करा',
+    'cancel': 'रद्द करा',
+    'Transactions:-': 'व्यवहार:-',
   };
 
   /// Get localized text based on the current language

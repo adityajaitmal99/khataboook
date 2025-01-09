@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/flutter_contacts.dart'; // For Flutter Contacts package
-import 'package:permission_handler/permission_handler.dart'; // For permission handling
-import 'package:shared_preferences/shared_preferences.dart'; // For shared preferences
-import '../I10n/app_locale.dart'; // Localization handling
-import '../Add customer/ContactsScreen.dart'; // Contact screen for adding customers
-import '../transaction_screens/TransactionDetailScreen.dart'; // Transaction screen for details
-import 'bills_screen.dart'; // Bills screen
-import 'items_screen.dart'; // Items screen
-import 'more_screen.dart'; // More screen
+import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../Add customer/ContactsScreen.dart';
+import '../Add customer/add_cutomer.dart';
+import '../I10n/app_locale.dart';
+import '../transaction_screens/TransactionDetailScreen.dart';
+import 'bills_screen.dart';
+import 'items_screen.dart';
+import 'more_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,7 +29,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Language selection screen where the user picks the language
 class LanguageSelectionScreen extends StatefulWidget {
   const LanguageSelectionScreen({super.key});
 
@@ -45,15 +45,13 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
     _loadLanguage();
   }
 
-  // Load the saved language from shared preferences
   Future<void> _loadLanguage() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      selectedLanguage = prefs.getString('language') ?? 'en'; // Default to 'en' if no language is saved
+      selectedLanguage = prefs.getString('language') ?? 'en';
     });
   }
 
-  // Save the selected language to shared preferences
   Future<void> _saveLanguage(String languageCode) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('language', languageCode);
@@ -81,7 +79,10 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => PartiesScreen(languageCode: value),
+                      builder: (context) => PartiesScreen(
+                        languageCode: value,
+                        initialContact: {},
+                      ),
                     ),
                   );
                 }
@@ -99,7 +100,10 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => PartiesScreen(languageCode: value),
+                      builder: (context) => PartiesScreen(
+                        languageCode: value,
+                        initialContact: {},
+                      ),
                     ),
                   );
                 }
@@ -112,11 +116,15 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   }
 }
 
-// Parties screen, where customers are shown based on selected language
 class PartiesScreen extends StatefulWidget {
   final String languageCode;
+  final Map<String, String> initialContact;
 
-  const PartiesScreen({super.key, required this.languageCode});
+  const PartiesScreen({
+    super.key,
+    required this.languageCode,
+    required this.initialContact,
+  });
 
   @override
   State<PartiesScreen> createState() => _PartiesScreenState();
@@ -125,33 +133,52 @@ class PartiesScreen extends StatefulWidget {
 class _PartiesScreenState extends State<PartiesScreen> {
   int _currentIndex = 0;
   List<Contact> selectedContacts = [];
+  List<Map<String, String>> manualContacts = [];
 
-  final List<Widget> _screens = [
-    PartiesScreenContent([], languageCode: 'en'), // Pass empty list initially for selected contacts
-    BillsScreen(),
-    ItemsScreen(itemName: '', salePrice: '', purchasePrice: ''),
-    MoreScreen(),
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialContact.isNotEmpty) {
+      manualContacts.add(widget.initialContact);
+    }
+  }
+
+  late final List<Widget> _screens = [
+    PartiesScreenContent(
+      selectedContacts: selectedContacts,
+      manualContacts: manualContacts,
+      languageCode: widget.languageCode,
+    ),
+    BillsScreen(languageCode: widget.languageCode),
+    ItemsScreen(
+      itemName: '',
+      salePrice: '',
+      purchasePrice: '',
+      languageCode: widget.languageCode,
+    ),
+    MoreScreen(languageCode: widget.languageCode),
   ];
 
   void _onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
-      if (index == 0) {
-        _screens[0] = PartiesScreenContent(selectedContacts, languageCode: widget.languageCode);
-      }
     });
   }
 
   Future<void> _addCustomer(BuildContext context) async {
     Contact? contact = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const ContactsScreen()),
+      MaterialPageRoute(builder: (context) => ContactsScreen(languageCode: '',)),
     );
 
     if (contact != null) {
       setState(() {
         selectedContacts.add(contact);
-        _screens[0] = PartiesScreenContent(selectedContacts, languageCode: widget.languageCode);
+        _screens[0] = PartiesScreenContent(
+          selectedContacts: selectedContacts,
+          manualContacts: manualContacts,
+          languageCode: widget.languageCode,
+        );
       });
     }
   }
@@ -196,12 +223,17 @@ class _PartiesScreenState extends State<PartiesScreen> {
   }
 }
 
-// This screen contains the list of parties (customers, suppliers)
 class PartiesScreenContent extends StatelessWidget {
   final List<Contact> selectedContacts;
+  final List<Map<String, String>> manualContacts;
   final String languageCode;
 
-  const PartiesScreenContent(this.selectedContacts, {super.key, required this.languageCode});
+  const PartiesScreenContent({
+    super.key,
+    required this.selectedContacts,
+    required this.manualContacts,
+    required this.languageCode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -229,13 +261,13 @@ class PartiesScreenContent extends StatelessWidget {
               ),
             ],
           ),
-          bottom: const TabBar(
+          bottom: TabBar(
             indicatorColor: Colors.yellow,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white70,
             tabs: [
-              Tab(text: 'CUSTOMERS'),
-              Tab(text: 'SUPPLIERS'),
+              Tab(text: AppLocale.getText(AppLocale.customers, languageCode)),
+              Tab(text: AppLocale.getText(AppLocale.suppliers, languageCode)),
             ],
           ),
         ),
@@ -279,31 +311,72 @@ class PartiesScreenContent extends StatelessWidget {
             const SizedBox(height: 10),
             Expanded(
               child: ListView.builder(
-                itemCount: selectedContacts.length,
+                itemCount: selectedContacts.length + manualContacts.length,
                 itemBuilder: (context, index) {
-                  Contact contact = selectedContacts[index];
-                  return _buildCustomerTile(
-                    context,
-                    contact.displayName,
-                    contact.phones.isNotEmpty ? contact.phones.first.number : AppLocale.getText(AppLocale.phoneNumber, languageCode),
-                    "₹ ${index * 10}",
-                    index % 2 == 0 ? Colors.red : Colors.green,
-                  );
+                  if (index < selectedContacts.length) {
+                    Contact contact = selectedContacts[index];
+                    return _buildCustomerTile(
+                      context,
+                      contact.displayName,
+                      contact.phones.isNotEmpty
+                          ? contact.phones.first.number
+                          : AppLocale.getText(AppLocale.phoneNumber, languageCode),
+                      '',
+                      "₹ ${index * 10}",
+                      index % 2 == 0 ? Colors.red : Colors.green,
+                    );
+                  } else {
+                    final manualContact = manualContacts[index - selectedContacts.length];
+                    return _buildCustomerTile(
+                      context,
+                      manualContact['name'] ?? '',
+                      manualContact['phone'] ?? '',
+                      manualContact['address'] ?? '',
+                      "₹ ${index * 10}",
+                      index % 2 == 0 ? Colors.red : Colors.green,
+                    );
+                  }
                 },
               ),
             ),
           ],
         ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AddPartyScreen(
+                  contact: selectedContacts.isNotEmpty ? selectedContacts.last : null, languageCode: 'mr',
+                ),
+              ),
+            );
+
+            if (result != null) {
+              print('New contact added: ${result['name']}, ${result['phone']}, ${result['address']}');
+            }
+          },
+          icon: const Icon(Icons.person_add),
+          label: Text(AppLocale.getText(AppLocale.addCustomer, languageCode)),
+          backgroundColor: Colors.blue,
+        ),
       ),
     );
   }
 
-  Widget _buildCustomerTile(BuildContext context, String name, String phone, String amount, Color color) {
+  Widget _buildCustomerTile(
+      BuildContext context, String name, String phone, String address, String amount, Color color) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       leading: const CircleAvatar(child: Icon(Icons.person)),
       title: Text(name),
-      subtitle: Text(phone),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(phone),
+          if (address.isNotEmpty) Text(address, style: TextStyle(fontSize: 12)),
+        ],
+      ),
       trailing: Text(
         amount,
         style: TextStyle(color: color, fontWeight: FontWeight.bold),
@@ -316,8 +389,8 @@ class PartiesScreenContent extends StatelessWidget {
               languageCode: languageCode,
               name: name,
               number: phone,
+              address: address, // Pass the address here
               timeAgo: AppLocale.getText(AppLocale.recentTransactions, languageCode),
-              amount: amount,
               amountColor: color,
             ),
           ),
@@ -325,4 +398,4 @@ class PartiesScreenContent extends StatelessWidget {
       },
     );
   }
-}
+  }

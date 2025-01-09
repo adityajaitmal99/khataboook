@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import '../I10n/app_locale.dart'; // Localization helper
+import 'add_cutomer.dart'; // Screen to add a new customer
 
 class ContactsScreen extends StatefulWidget {
-  const ContactsScreen({super.key});
+  final String languageCode; // Language code for localization
+
+  const ContactsScreen({super.key, required this.languageCode});
 
   @override
   _ContactsScreenState createState() => _ContactsScreenState();
@@ -26,7 +30,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
       _loading = true;
     });
 
-    if (await FlutterContacts.requestPermission()) {
+    // Request permission and fetch contacts
+    bool permissionGranted = await FlutterContacts.requestPermission();
+    if (permissionGranted) {
       List<Contact> contacts = await FlutterContacts.getContacts(
         withThumbnail: true,
         withProperties: true,
@@ -41,8 +47,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
         _loading = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Permission is required to access contacts."),
+      // Notify the user if permission is denied
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(AppLocale.getText('permissionDenied', widget.languageCode)),
       ));
     }
   }
@@ -50,11 +57,12 @@ class _ContactsScreenState extends State<ContactsScreen> {
   void _filterContacts() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      _filteredContacts.clear();
-      _filteredContacts.addAll(
-        _contacts.where((contact) =>
-            contact.displayName.toLowerCase().contains(query)),
-      );
+      _filteredContacts
+        ..clear()
+        ..addAll(
+          _contacts.where((contact) =>
+              contact.displayName.toLowerCase().contains(query)),
+        );
     });
   }
 
@@ -68,11 +76,20 @@ class _ContactsScreenState extends State<ContactsScreen> {
     Navigator.pop(context, contact);
   }
 
+  void _navigateToAddPartyScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddPartyScreen(languageCode: widget.languageCode),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Select Contact"),
+        title: Text(AppLocale.getText('selectContact', widget.languageCode)),
         backgroundColor: Colors.blue,
       ),
       body: Column(
@@ -82,7 +99,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: "Search Contacts",
+                hintText: AppLocale.getText('searchContacts', widget.languageCode),
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: Colors.grey.shade200,
@@ -106,7 +123,10 @@ class _ContactsScreenState extends State<ContactsScreen> {
             child: _loading
                 ? const Center(child: CircularProgressIndicator())
                 : _filteredContacts.isEmpty
-                ? const Center(child: Text("No contacts found."))
+                ? Center(
+              child: Text(AppLocale.getText(
+                  'noContactsFound', widget.languageCode)),
+            )
                 : ListView.builder(
               itemCount: _filteredContacts.length,
               itemBuilder: (context, index) {
@@ -121,15 +141,21 @@ class _ContactsScreenState extends State<ContactsScreen> {
                         : null,
                   ),
                   title: Text(contact.displayName),
-                  subtitle: contact.phones.isNotEmpty
-                      ? Text(contact.phones.first.number)
-                      : const Text("No phone number"),
+                  subtitle: Text(contact.phones.isNotEmpty
+                      ? contact.phones.first.number
+                      : AppLocale.getText(
+                      'noPhoneNumber', widget.languageCode)),
                   onTap: () => _selectContact(contact),
                 );
               },
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _navigateToAddPartyScreen,
+        backgroundColor: Colors.blue,
+        child: const Icon(Icons.add),
       ),
     );
   }

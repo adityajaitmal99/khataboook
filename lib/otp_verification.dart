@@ -109,7 +109,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => PartiesScreen(languageCode: widget.languageCode),
+        builder: (context) => PartiesScreen(languageCode: widget.languageCode, initialContact: {},),
       ),
     );
   }

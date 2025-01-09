@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../I10n/app_locale.dart'; // Assuming AppLocale is in this file
 
 class MoreScreen extends StatefulWidget {
-  const MoreScreen({super.key});
+  final String languageCode;
+
+  // Accept languageCode as a parameter
+  const MoreScreen({super.key, required this.languageCode});
 
   @override
   State<MoreScreen> createState() => _MoreScreenState();
@@ -9,12 +14,43 @@ class MoreScreen extends StatefulWidget {
 
 class _MoreScreenState extends State<MoreScreen> {
   bool _isAppInfoVisible = false;
+  User? _currentUser;
 
+  // Use widget.languageCode to get the passed language code
+  String get languageCode => widget.languageCode;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUser = FirebaseAuth.instance.currentUser;
+  }
+
+  // Method to handle Logout
+  Future<void> _logout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      setState(() {
+        _currentUser = null; // Reset the user details after logout
+      });
+      Navigator.pushReplacementNamed(context, '/login');
+    } catch (e) {
+      _showSnackbar(AppLocale.getText(AppLocale.logout, languageCode));
+    }
+  }
+
+  // Display a snackbar
+  void _showSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Changed the background color to white
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('More'),
+        title: Text(AppLocale.getText(AppLocale.more, languageCode)),
         backgroundColor: Colors.blue,
         centerTitle: true,
       ),
@@ -36,26 +72,36 @@ class _MoreScreenState extends State<MoreScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Username ",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      Text(
+                        _currentUser != null
+                            ? _currentUser!.displayName ?? AppLocale.getText(AppLocale.profile, languageCode)
+                            : AppLocale.getText(AppLocale.more, languageCode),
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        "abc@gmail.com",
+                        _currentUser != null
+                            ? _currentUser!.email ?? 'abc@gmail.com'
+                            : AppLocale.getText(AppLocale.more, languageCode),
                         style: TextStyle(fontSize: 14, color: Colors.black54),
                       ),
                       const SizedBox(height: 8),
                       TextButton(
                         onPressed: () {
-                          // Navigate to Edit Profile Screen
+                          if (_currentUser != null) {
+                            // Navigate to Edit Profile Screen
+                          } else {
+                            Navigator.pushNamed(context, '/login');
+                          }
                         },
                         style: TextButton.styleFrom(
                           backgroundColor: Colors.white,
                         ),
-                        child: const Text(
-                          "Edit Profile",
-                          style: TextStyle(fontSize: 14, color: Colors.blue),
+                        child: Text(
+                          _currentUser != null
+                              ? AppLocale.getText(AppLocale.updateProfile, languageCode)
+                              : AppLocale.getText(AppLocale.logout, languageCode),
+                          style: const TextStyle(fontSize: 14, color: Colors.blue),
                         ),
                       ),
                     ],
@@ -68,31 +114,24 @@ class _MoreScreenState extends State<MoreScreen> {
 
           // Features Section
           _buildFeatureCard(
-            title: "Business Settings",
+            title: AppLocale.getText(AppLocale.settings, languageCode),
             icon: Icons.settings,
             onTap: () {
               // Navigate to Business Settings
             },
           ),
           _buildFeatureCard(
-            title: "Share App",
-            icon: Icons.share,
+            title: AppLocale.getText(AppLocale.language, languageCode),
+            icon: Icons.language,
             onTap: () {
-              // Share app functionality
+              // Handle language change
             },
           ),
           _buildFeatureCard(
-            title: "Rate Us",
-            icon: Icons.star,
+            title: AppLocale.getText(AppLocale.notifications, languageCode),
+            icon: Icons.notifications,
             onTap: () {
-              // Navigate to Rate Us screen
-            },
-          ),
-          _buildFeatureCard(
-            title: "Help & Support",
-            icon: Icons.help,
-            onTap: () {
-              // Navigate to Help & Support screen
+              // Navigate to Notifications screen
             },
           ),
           const SizedBox(height: 10),
@@ -110,9 +149,9 @@ class _MoreScreenState extends State<MoreScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "App Info",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  Text(
+                    AppLocale.getText(AppLocale.more, languageCode),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   Icon(
                     _isAppInfoVisible
@@ -131,11 +170,11 @@ class _MoreScreenState extends State<MoreScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildInfoRow("Version", "1.0.0"),
+                  _buildInfoRow(AppLocale.getText(AppLocale.settings, languageCode), "1.0.0"),
                   const Divider(),
-                  _buildInfoRow("Privacy Policy", "Read"),
+                  _buildInfoRow(AppLocale.getText(AppLocale.logout, languageCode), AppLocale.getText(AppLocale.logout, languageCode)),
                   const Divider(),
-                  _buildInfoRow("Terms & Conditions", "Read"),
+                  _buildInfoRow(AppLocale.getText(AppLocale.language, languageCode), AppLocale.getText(AppLocale.language, languageCode)),
                 ],
               ),
             ),
@@ -164,6 +203,25 @@ class _MoreScreenState extends State<MoreScreen> {
           ),
           const SizedBox(height: 20),
 
+          // Logout Button Section
+          if (_currentUser != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: ElevatedButton(
+                onPressed: _logout,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  AppLocale.getText(AppLocale.logout, languageCode),
+                  style: const TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+            ),
         ],
       ),
     );

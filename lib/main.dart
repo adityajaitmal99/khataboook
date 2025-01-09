@@ -4,20 +4,15 @@ import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core packa
 import 'package:flutter_localizations/flutter_localizations.dart'; // Import the necessary localizations package
 import 'package:khataboook/bottom%20navigation/parties_screen.dart';
 import 'I10n/language_selection.dart'; // Import language selection page
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize Firebase
   await Firebase.initializeApp();
-
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  runApp(const MyApp());
-}
+  runApp(const MyApp());}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -39,7 +34,7 @@ class MyApp extends StatelessWidget {
         GlobalMaterialLocalizations.delegate, // Localization delegate for material components
         GlobalWidgetsLocalizations.delegate, // Localization delegate for widget components
       ],
-      home: const PartiesScreen(languageCode: 'en'), // Home page is language selection
+      home: LanguageSelectionPage(), // Home page is language selection
     );
   }
 }

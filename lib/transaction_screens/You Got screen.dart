@@ -1,10 +1,18 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart'; // Import permission handler package
+import 'package:permission_handler/permission_handler.dart';
+import '../model/TransactionDetails.dart';
 
 class TransactionScreenn extends StatefulWidget {
-  const TransactionScreenn({super.key});
+  final String name;
+  final bool isGave;
+
+  const TransactionScreenn({
+    super.key,
+    required this.name,
+    required this.isGave,
+  });
 
   @override
   _TransactionScreenState createState() => _TransactionScreenState();
@@ -15,11 +23,9 @@ class _TransactionScreenState extends State<TransactionScreenn> {
   final TextEditingController _detailsController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
   bool _isCalculatorVisible = false;
-  File? _image; // Variable to store selected image
+  XFile? _image;
+  final ImagePicker _picker = ImagePicker();
 
-  final ImagePicker _picker = ImagePicker(); // Image picker instance
-
-  // Function to handle date picker
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -34,7 +40,6 @@ class _TransactionScreenState extends State<TransactionScreenn> {
     }
   }
 
-  // Function to handle save action
   void _saveTransaction() {
     if (_amountController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -42,16 +47,20 @@ class _TransactionScreenState extends State<TransactionScreenn> {
       );
       return;
     }
-    // Add your save logic here
-    print("Transaction Saved with Amount: ${_amountController.text}");
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Transaction Saved!")),
+
+    final transactionDetails = TransactionDetails(
+      amount: double.parse(_amountController.text),
+      details: _detailsController.text,
+      date: _selectedDate,
+      attachedBill: _image,
+      isGave: false,
+      isGot: true,
     );
+
+    Navigator.pop(context, transactionDetails);
   }
 
-  // Function to pick an image from gallery or camera
   Future<void> _pickImage({bool fromCamera = false}) async {
-    // Check if camera permission is needed and request it
     if (fromCamera) {
       final permissionStatus = await Permission.camera.request();
       if (!permissionStatus.isGranted) {
@@ -62,37 +71,35 @@ class _TransactionScreenState extends State<TransactionScreenn> {
       }
     }
 
-    // Pick image from the specified source (gallery or camera)
     final XFile? image = await _picker.pickImage(
       source: fromCamera ? ImageSource.camera : ImageSource.gallery,
     );
 
-    // If an image was picked, update the state
     if (image != null) {
       setState(() {
-        _image = File(image.path);
+        _image = image;
       });
     }
   }
 
-  // Custom calculator button widget
-  Widget _calcButton(String text, {Function()? onPressed}) {
+  Widget _calcButton(String text, {Color color = Colors.white, Function()? onPressed}) {
     return Expanded(
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
+          backgroundColor: color,
           padding: const EdgeInsets.all(18.0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
+          elevation: 5,
+          shadowColor: Colors.black.withOpacity(0.3),
         ),
         child: Text(text, style: const TextStyle(fontSize: 18, color: Colors.black)),
       ),
     );
   }
 
-  // Function to handle calculator input
   void _onCalculatorButtonPressed(String buttonText) {
     setState(() {
       if (buttonText == 'C') {
@@ -103,7 +110,6 @@ class _TransactionScreenState extends State<TransactionScreenn> {
         }
       } else if (buttonText == "=") {
         try {
-          // Evaluating the expression
           _amountController.text = _evaluateExpression(_amountController.text);
         } catch (e) {
           _amountController.text = 'Error';
@@ -114,10 +120,8 @@ class _TransactionScreenState extends State<TransactionScreenn> {
     });
   }
 
-  // A simple expression evaluator for basic arithmetic operations
   String _evaluateExpression(String expression) {
     try {
-      // Basic replacement of operators for a simple eval
       expression = expression.replaceAll('×', '*').replaceAll('÷', '/');
       final result = _calculateExpression(expression);
       return result.toString();
@@ -126,7 +130,6 @@ class _TransactionScreenState extends State<TransactionScreenn> {
     }
   }
 
-  // Function to calculate the result of an arithmetic expression
   double _calculateExpression(String expression) {
     final parts = expression.split(RegExp(r'(\+|\-|\×|\÷)'));
     double result = double.tryParse(parts[0]) ?? 0;
@@ -146,7 +149,7 @@ class _TransactionScreenState extends State<TransactionScreenn> {
           if (nextValue != 0) {
             result /= nextValue;
           } else {
-            return double.nan; // Avoid division by zero
+            return double.nan;
           }
           break;
       }
@@ -154,7 +157,6 @@ class _TransactionScreenState extends State<TransactionScreenn> {
     return result;
   }
 
-  // Handle input field focus
   void _onAmountFieldFocusChange(bool hasFocus) {
     setState(() {
       _isCalculatorVisible = hasFocus;
@@ -166,44 +168,26 @@ class _TransactionScreenState extends State<TransactionScreenn> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Transaction Screen"),
-        backgroundColor: Colors.green, // Changed color to green
+        title: Text("You got ₹ from ${widget.name}"),
+        backgroundColor: Colors.green,
       ),
       body: GestureDetector(
         onTap: () {
-          // Hide the calculator when tapping outside of the input fields
           FocusScope.of(context).unfocus();
         },
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Amount input (now using calculator only, keyboard disabled)
-                Focus(
-                  onFocusChange: _onAmountFieldFocusChange,
-                  child: TextField(
-                    controller: _amountController,
-                    keyboardType: TextInputType.none,  // Disable the standard keyboard
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.currency_rupee, color: Colors.green), // Changed to green
-                      hintText: "Enter Amount",
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-
-                // Details input
-                TextField(
-                  controller: _detailsController,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Focus(
+                onFocusChange: _onAmountFieldFocusChange,
+                child: TextField(
+                  controller: _amountController,
+                  keyboardType: TextInputType.none,
                   decoration: InputDecoration(
-                    hintText: "Enter details (Items, bill no., quantity, etc.)",
+                    prefixIcon: const Icon(Icons.currency_rupee, color: Colors.green),
+                    hintText: "Enter Amount",
                     filled: true,
                     fillColor: Colors.grey[200],
                     border: OutlineInputBorder(
@@ -211,112 +195,117 @@ class _TransactionScreenState extends State<TransactionScreenn> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+              ),
+              const SizedBox(height: 10),
 
-                // Date picker and attachment row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () => _selectDate(context),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.calendar_today, color: Colors.green), // Changed to green
-                            const SizedBox(width: 10),
-                            Text(
-                              "${_selectedDate.day} ${_selectedDate.month} ${_selectedDate.year}",
-                              style: const TextStyle(color: Colors.black54),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: () => _pickImage(fromCamera: false), // Trigger the image picker (gallery)
-                      icon: const Icon(Icons.camera_alt, color: Colors.green), // Changed to green
-                      label: const Text("Attach bills"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.green, // Changed to green
-                        side: const BorderSide(color: Colors.green),
-                      ),
-                    ),
-                   /* ElevatedButton.icon(
-                      onPressed: () => _pickImage(fromCamera: true), // Trigger the image picker (camera)
-                      icon: const Icon(Icons.camera, color: Colors.green), // Changed to green
-                      label: const Text("Capture Image"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.green, // Changed to green
-                        side: const BorderSide(color: Colors.green),
-                      ),
-                    ),*/
-                  ],
+              TextField(
+                controller: _detailsController,
+                decoration: InputDecoration(
+                  hintText: "Enter details: Items, bill no., quantity, etc.",
+                  filled: true,
+                  fillColor: Colors.grey[200],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
                 ),
-                const SizedBox(height: 20),
+              ),
+              const SizedBox(height: 10),
 
-                // Display picked image (if any)
-                if (_image != null)
-                  Image.file(
-                    _image!,
-                    width: double.infinity,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  ),
-
-                const SizedBox(height: 20),
-
-                // Save button
-                ElevatedButton(
-                  onPressed: _saveTransaction,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green, // Changed to green
-                    minimumSize: const Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () => _selectDate(context),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.calendar_today, color: Colors.green),
+                          const SizedBox(width: 10),
+                          Text(
+                            "${_selectedDate.day} ${_selectedDate.month} ${_selectedDate.year}",
+                            style: const TextStyle(color: Colors.black54),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  child: const Text("SAVE"),
+                  ElevatedButton.icon(
+                    onPressed: _pickImage,
+                    icon: const Icon(Icons.camera_alt, color: Colors.green),
+                    label: const Text("Attach bills"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.green,
+                      side: const BorderSide(color: Colors.green),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              if (_image != null)
+                Image.file(
+                  File(_image!.path),
+                  height: 150,
+                  width: 150,
+                  fit: BoxFit.cover,
                 ),
-                const SizedBox(height: 200),
 
-                // Show calculator if it's visible
-                if (_isCalculatorVisible)
-                  Container(
-                    height: 350, // Fixed height for calculator
-                    child: GridView.count(
-                      crossAxisCount: 4,
-                      childAspectRatio: 1.5,
-                      mainAxisSpacing: 8.0,
-                      crossAxisSpacing: 8.0,
-                      children: [
-                        _calcButton("C", onPressed: () => _onCalculatorButtonPressed("C")),
-                        _calcButton("M+", onPressed: null),
-                        _calcButton("M-", onPressed: null),
-                        _calcButton("⌫", onPressed: () => _onCalculatorButtonPressed("⌫")),
-                        ...["7", "8", "9", "÷", "4", "5", "6", "×", "1", "2", "3", "-"].map((e) => _calcButton(e, onPressed: () => _onCalculatorButtonPressed(e))),
-                        _calcButton("0", onPressed: () => _onCalculatorButtonPressed("0")),
-                        _calcButton(".", onPressed: () {
-                          if (!_amountController.text.contains(".")) {
-                            _onCalculatorButtonPressed(".");
-                          }
-                        }),
-                        _calcButton("=", onPressed: () => _onCalculatorButtonPressed("=")),
-                        _calcButton("+", onPressed: () => _onCalculatorButtonPressed("+")),
-                      ],
-                    ),
+              const SizedBox(height: 20),
+
+              ElevatedButton(
+                onPressed: _saveTransaction,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
                   ),
-              ],
-            ),
+                ),
+                child: const Text("SAVE"),
+              ),
+              const SizedBox(height: 10),
+            ],
           ),
         ),
       ),
+
+      bottomSheet: _isCalculatorVisible
+          ? Padding(
+        padding: const EdgeInsets.fromLTRB(8, 5, 8, 3),
+        child: Container(
+          color: Colors.white,
+          child: GridView.count(
+            shrinkWrap: true,
+            crossAxisCount: 4,
+            childAspectRatio: 1.5,
+            mainAxisSpacing: 5.0,
+            crossAxisSpacing: 6.0,
+            children: [
+              _calcButton("C", onPressed: () => _onCalculatorButtonPressed("C")),
+              _calcButton("M+", onPressed: () {}),
+              _calcButton("M-", onPressed: () {}),
+              _calcButton("⌫", onPressed: () => _onCalculatorButtonPressed("⌫")),
+              ...["7", "8", "9", "÷", "4", "5", "6", "×", "1", "2", "3", "-"]
+                  .map((e) => _calcButton(e, onPressed: () => _onCalculatorButtonPressed(e))),
+              _calcButton("0", onPressed: () => _onCalculatorButtonPressed("0")),
+              _calcButton(".", onPressed: () {
+                if (!_amountController.text.contains(".")) {
+                  _onCalculatorButtonPressed(".");
+                }
+              }),
+              _calcButton("=", onPressed: () => _onCalculatorButtonPressed("=")),
+              _calcButton("+", onPressed: () => _onCalculatorButtonPressed("+")),
+            ],
+          ),
+        ),
+      )
+          : null,
     );
   }
 }

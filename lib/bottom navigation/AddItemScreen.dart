@@ -8,7 +8,7 @@ import '../utils/localization_manager.dart';
  // Import the localization manager
 
 class AddItemScreen extends StatefulWidget {
-  const AddItemScreen({super.key});
+  const AddItemScreen({super.key, required String languageCode});
 
   @override
   _AddItemScreenState createState() => _AddItemScreenState();

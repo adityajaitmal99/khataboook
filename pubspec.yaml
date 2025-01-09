@@ -52,8 +52,12 @@ dev_dependencies:
   firebase_auth: ^5.3.4
   firebase_core: ^3.9.0
   firebase_messaging:
+  cloud_firestore:
   flutter_lints: ^5.0.0
   firebase_data_connect:
+  google_sign_in:
+# Flutter Launcher Icons configuration
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -66,8 +70,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+  - assets/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -1,19 +1,15 @@
 import 'dart:io';
-
 import 'package:khataboook/helper/pdf_helper.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/widgets.dart';
-
 import '../model/customer.dart';
 import '../model/invoice.dart';
 import '../model/supplier.dart';
 import '../utils.dart';
-
 class PdfInvoicePdfHelper {
   static Future<File> generate(Invoice invoice) async {
     final pdf = Document();
-
     pdf.addPage(MultiPage(
       margin: const EdgeInsets.all(20),
       build: (context) => [
@@ -26,10 +22,8 @@ class PdfInvoicePdfHelper {
       ],
       footer: (context) => buildFooter(invoice),
     ));
-
     return PdfHelper.saveDocument(name: 'invoice_${invoice.info.number}.pdf', pdf: pdf);
   }
-
   static Widget buildHeader(Invoice invoice) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -114,7 +108,6 @@ class PdfInvoicePdfHelper {
       SizedBox(height: 0.5 * PdfPageFormat.cm),
     ],
   );
-
   static Widget buildInvoiceTable(Invoice invoice) {
     final headers = ['Description', 'Date', 'Qty', 'Unit Price', 'VAT', 'Total'];
     final data = invoice.items.map((item) {

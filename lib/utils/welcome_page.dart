@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../I10n/app_locale.dart';
 import '../LoginPage.dart';
- // Import for language mappings
+// Import for language mappings
 
 class WelcomePage extends StatefulWidget {
   final String languageCode;
@@ -31,10 +31,10 @@ class _WelcomePageState extends State<WelcomePage> {
             children: <Widget>[
               Container(
                 margin: const EdgeInsets.only(bottom: 20),
-                child: const Icon(
-                  Icons.account_balance_wallet,
-                  size: 100,
-                  color: Colors.white,
+                child: Image.asset(
+                  'assets/companey logo.jpg', // Replace with your image path
+                  width: 100,
+                  height: 100,
                 ),
               ),
               Text(

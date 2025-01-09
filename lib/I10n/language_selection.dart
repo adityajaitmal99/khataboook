@@ -109,7 +109,7 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage>
                   ),
                 ),
                 child: const Text(
-                  'START USING KHATABOOK',
+                  'START USING SOFTGRID BILLING-APP',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

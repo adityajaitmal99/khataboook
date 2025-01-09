@@ -27,7 +27,7 @@ class TransactionEntry extends StatelessWidget {
             color: Colors.grey.withOpacity(0.1),
             spreadRadius: 1,
             blurRadius: 5,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -39,23 +39,23 @@ class TransactionEntry extends StatelessWidget {
             children: [
               Text(
                 dateTime,
-                style: TextStyle(color: Colors.grey, fontSize: 12),
+                style: const TextStyle(color: Colors.grey, fontSize: 12),
               ),
               Text(
                 'Bal. $balance',
-                style: TextStyle(color: Colors.grey, fontSize: 12),
+                style: const TextStyle(color: Colors.grey, fontSize: 12),
               ),
             ],
           ),
           if (youGave != null)
             Text(
               youGave!,
-              style: TextStyle(color: Colors.red, fontSize: 16),
+              style: const TextStyle(color: Colors.red, fontSize: 16),
             ),
           if (youGot != null)
             Text(
               youGot!,
-              style: TextStyle(color: Colors.green, fontSize: 16),
+              style: const TextStyle(color: Colors.green, fontSize: 16),
             ),
         ],
       ),

@@ -1,11 +1,17 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../model/TransactionDetails.dart';
+
 
 class TransactionScreen extends StatefulWidget {
-  const TransactionScreen({super.key});
+  final String name;
+
+  const TransactionScreen({
+    super.key,
+    required this.name, required bool isGave,
+  });
 
   @override
   _TransactionScreenState createState() => _TransactionScreenState();
@@ -16,11 +22,9 @@ class _TransactionScreenState extends State<TransactionScreen> {
   final TextEditingController _detailsController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
   bool _isCalculatorVisible = false;
-  XFile? _image;  // To hold the picked image
-
+  XFile? _image;
   final ImagePicker _picker = ImagePicker();
 
-  // Function to handle date picker
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -35,7 +39,6 @@ class _TransactionScreenState extends State<TransactionScreen> {
     }
   }
 
-  // Function to handle save action
   void _saveTransaction() {
     if (_amountController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -43,32 +46,39 @@ class _TransactionScreenState extends State<TransactionScreen> {
       );
       return;
     }
-    // Add your save logic here
-    print("Transaction Saved with Amount: ${_amountController.text}");
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Transaction Saved!")),
+
+    final transactionDetails = TransactionDetails(
+      amount: double.parse(_amountController.text),
+      details: _detailsController.text,
+      date: _selectedDate,
+      attachedBill: _image, isGave: true, isGot: false,
     );
+
+    Navigator.pop(context, transactionDetails);
   }
 
-  // Function to pick an image using the camera
-  Future<void> _pickImage() async {
-    // Check for camera permission
-    final permissionStatus = await Permission.camera.request();
-    if (permissionStatus.isGranted) {
-      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
-      if (pickedFile != null) {
-        setState(() {
-          _image = pickedFile;
-        });
+  Future<void> _pickImage({bool fromCamera = false}) async {
+    if (fromCamera) {
+      final permissionStatus = await Permission.camera.request();
+      if (!permissionStatus.isGranted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Camera permission denied")),
+        );
+        return;
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Camera permission denied")),
-      );
+    }
+
+    final XFile? image = await _picker.pickImage(
+      source: fromCamera ? ImageSource.camera : ImageSource.gallery,
+    );
+
+    if (image != null) {
+      setState(() {
+        _image = image;
+      });
     }
   }
 
-  // Custom calculator button widget
   Widget _calcButton(String text, {Color color = Colors.white, Function()? onPressed}) {
     return Expanded(
       child: ElevatedButton(
@@ -79,15 +89,14 @@ class _TransactionScreenState extends State<TransactionScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
-          elevation: 5, // Shadow effect for buttons
-          shadowColor: Colors.black.withOpacity(0.3), // Light shadow color
+          elevation: 5,
+          shadowColor: Colors.black.withOpacity(0.3),
         ),
         child: Text(text, style: const TextStyle(fontSize: 18, color: Colors.black)),
       ),
     );
   }
 
-  // Function to handle calculator input
   void _onCalculatorButtonPressed(String buttonText) {
     setState(() {
       if (buttonText == 'C') {
@@ -98,7 +107,6 @@ class _TransactionScreenState extends State<TransactionScreen> {
         }
       } else if (buttonText == "=") {
         try {
-          // Evaluating the expression
           _amountController.text = _evaluateExpression(_amountController.text);
         } catch (e) {
           _amountController.text = 'Error';
@@ -109,10 +117,8 @@ class _TransactionScreenState extends State<TransactionScreen> {
     });
   }
 
-  // A simple expression evaluator for basic arithmetic operations
   String _evaluateExpression(String expression) {
     try {
-      // Basic replacement of operators for a simple eval
       expression = expression.replaceAll('×', '*').replaceAll('÷', '/');
       final result = _calculateExpression(expression);
       return result.toString();
@@ -121,7 +127,6 @@ class _TransactionScreenState extends State<TransactionScreen> {
     }
   }
 
-  // Function to calculate the result of an arithmetic expression
   double _calculateExpression(String expression) {
     final parts = expression.split(RegExp(r'(\+|\-|\×|\÷)'));
     double result = double.tryParse(parts[0]) ?? 0;
@@ -141,7 +146,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
           if (nextValue != 0) {
             result /= nextValue;
           } else {
-            return double.nan; // Avoid division by zero
+            return double.nan;
           }
           break;
       }
@@ -149,7 +154,6 @@ class _TransactionScreenState extends State<TransactionScreen> {
     return result;
   }
 
-  // Handle input field focus
   void _onAmountFieldFocusChange(bool hasFocus) {
     setState(() {
       _isCalculatorVisible = hasFocus;
@@ -161,12 +165,11 @@ class _TransactionScreenState extends State<TransactionScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("You gave ₹ 5 to Aditya Jaitmal"),
+        title: Text("You gave ₹ to ${widget.name}"),
         backgroundColor: Colors.red,
       ),
       body: GestureDetector(
         onTap: () {
-          // Hide the calculator when tapping outside of the input fields
           FocusScope.of(context).unfocus();
         },
         child: Padding(
@@ -174,12 +177,11 @@ class _TransactionScreenState extends State<TransactionScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Amount input (now using calculator only, keyboard disabled)
               Focus(
                 onFocusChange: _onAmountFieldFocusChange,
                 child: TextField(
                   controller: _amountController,
-                  keyboardType: TextInputType.none,  // Disable the standard keyboard
+                  keyboardType: TextInputType.none,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.currency_rupee, color: Colors.red),
                     hintText: "Enter Amount",
@@ -193,7 +195,6 @@ class _TransactionScreenState extends State<TransactionScreen> {
               ),
               const SizedBox(height: 10),
 
-              // Details input
               TextField(
                 controller: _detailsController,
                 decoration: InputDecoration(
@@ -207,7 +208,6 @@ class _TransactionScreenState extends State<TransactionScreen> {
               ),
               const SizedBox(height: 10),
 
-              // Date picker and attachment row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -245,7 +245,6 @@ class _TransactionScreenState extends State<TransactionScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Show the image preview if an image is picked
               if (_image != null)
                 Image.file(
                   File(_image!.path),
@@ -254,7 +253,8 @@ class _TransactionScreenState extends State<TransactionScreen> {
                   fit: BoxFit.cover,
                 ),
 
-              SizedBox(height: 20),// Save button
+              const SizedBox(height: 20),
+
               ElevatedButton(
                 onPressed: _saveTransaction,
                 style: ElevatedButton.styleFrom(
@@ -272,12 +272,11 @@ class _TransactionScreenState extends State<TransactionScreen> {
         ),
       ),
 
-      // Positioned calculator fixed to the bottom
       bottomSheet: _isCalculatorVisible
           ? Padding(
         padding: const EdgeInsets.fromLTRB(8, 5, 8, 3),
         child: Container(
-          color: Colors.white, // Background color for calculator container
+          color: Colors.white,
           child: GridView.count(
             shrinkWrap: true,
             crossAxisCount: 4,

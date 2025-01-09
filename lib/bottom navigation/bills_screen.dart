@@ -1,34 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:khataboook/pdf_page.dart'; // Import the Generate Bill screen
+import '../I10n/app_locale.dart'; // Import your AppLocale class
 
 class BillsScreen extends StatelessWidget {
+  final String languageCode; // The language code (e.g., 'en' for English, 'mr' for Marathi)
+
+  BillsScreen({required this.languageCode});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.blue,
-        title: const Text('Business Name'),
+        title: Text(AppLocale.getText(AppLocale.title, languageCode)), // Localized app title
         actions: [
           IconButton(icon: const Icon(Icons.settings), onPressed: () {}), // Settings icon
         ],
       ),
       body: Column(
         children: [
-          // Top stats section
           _buildTopStatsSection(),
           const SizedBox(height: 10),
-          // Tabs section (Sale, Purchase, Expense)
           _buildTabs(),
           const SizedBox(height: 10),
-          // Search and filter section
           _buildSearchAndFilter(),
           const SizedBox(height: 10),
-          // No bills message
           Expanded(
             child: Center(
               child: Text(
-                "No bills available",
+                AppLocale.getText(AppLocale.noCustomers, languageCode), // Localized "No bills available"
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ),
@@ -42,17 +43,17 @@ class BillsScreen extends StatelessWidget {
 
   Widget _buildTopStatsSection() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      color: Colors.blue.shade50,
-      child: Row(
+     // padding: const EdgeInsets.symmetric(vertical: 16.0),
+      //color: Colors.blue.shade50,
+     /* child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildStatCard('₹0', 'Monthly Sales', Colors.green),
-          _buildStatCard('₹0', 'Monthly Purchases', Colors.red),
-          _buildStatCard('₹0', "Today's IN", Colors.blue),
-          _buildStatCard('₹0', "Today's OUT", Colors.orange),
+          _buildStatCard('₹0', AppLocale.getText(AppLocale.monthlySales, languageCode), Colors.green),
+          _buildStatCard('₹0', AppLocale.getText(AppLocale.monthlyPurchases, languageCode), Colors.red),
+          _buildStatCard('₹0', AppLocale.getText(AppLocale.todayIn, languageCode), Colors.blue),
+          _buildStatCard('₹0', AppLocale.getText(AppLocale.todayOut, languageCode), Colors.orange),
         ],
-      ),
+      ),*/
     );
   }
 
@@ -75,9 +76,9 @@ class BillsScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildTab('Sale', isSelected: true),
-          _buildTab('Purchase'),
-          _buildTab('Expense'),
+          _buildTab(AppLocale.getText(AppLocale.sale, languageCode), isSelected: true),
+          _buildTab(AppLocale.getText(AppLocale.purchase, languageCode)),
+          _buildTab(AppLocale.getText(AppLocale.expense, languageCode)),
         ],
       ),
     );
@@ -114,7 +115,7 @@ class BillsScreen extends StatelessWidget {
           Expanded(
             child: TextField(
               decoration: InputDecoration(
-                hintText: 'Search for transactions',
+                hintText: AppLocale.getText(AppLocale.searchForTransactions, languageCode), // Localized search hint
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
@@ -143,9 +144,9 @@ class BillsScreen extends StatelessWidget {
         );
       },
       icon: const Icon(Icons.add, color: Colors.white),
-      label: const Text(
-        "Add Bill",
-        style: TextStyle(color: Colors.white),
+      label: Text(
+        AppLocale.getText(AppLocale.addBill, languageCode), // Localized "Add Bill"
+        style: const TextStyle(color: Colors.white),
       ),
       backgroundColor: Colors.blue,
     );

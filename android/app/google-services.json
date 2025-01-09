@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "1077831417382",
+    "project_id": "khata-4ffe4",
+    "storage_bucket": "khata-4ffe4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1077831417382:android:e1e0780bf16584edd2b0e7",
+        "android_client_info": {
+          "package_name": "com.example.khataboook"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1077831417382-9bs7n0pb74fb5gmocgqcu5458448td0r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.khataboook",
+            "certificate_hash": "3abff3f687403e6fe29099c0be1845d23147a33b"
+          }
+        },
+        {
+          "client_id": "1077831417382-jcb4pjn22atr2plt7i6ofovt0p412c8u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdp_MXG2xWmROBxznhZLDFa2Fz990wt_s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1077831417382-jcb4pjn22atr2plt7i6ofovt0p412c8u.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1077831417382-h2ag9fh3pcrnn8uavaqlebhuguhd3g0d.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.khataboook"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

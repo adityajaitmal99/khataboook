@@ -1,11 +1,16 @@
 import 'dart:io'; // For using Image.file
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
- // Import the image_picker package
 import 'package:khataboook/bottom%20navigation/AddItemScreen.dart';
+import '../I10n/app_locale.dart'; // Import for localization
 
 class ItemsScreen extends StatefulWidget {
-  const ItemsScreen({super.key, required String itemName, required String salePrice, required String purchasePrice});
+  final String languageCode;
+
+  const ItemsScreen({
+    super.key,
+    required this.languageCode, required String itemName, required String salePrice, required String purchasePrice,
+  });
 
   @override
   _ItemsScreenState createState() => _ItemsScreenState();
@@ -62,9 +67,9 @@ class _ItemsScreenState extends State<ItemsScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          'Vishal Jangle',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+        title: Text(
+          AppLocale.getText(AppLocale.stockManagement, widget.languageCode),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: Colors.blue,
         actions: [
@@ -83,14 +88,14 @@ class _ItemsScreenState extends State<ItemsScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildStatCard('₹0', 'Total Stock Value'),
-                _buildStatCard('0', 'Low Stock Items'),
+                //_buildStatCard('₹0', AppLocale.getText(AppLocale.totalStockValue, widget.languageCode)),
+                //_buildStatCard('0', AppLocale.getText(AppLocale.lowStockItems, widget.languageCode)),
                 GestureDetector(
                   onTap: () {
                     // Navigate to Reports
                   },
                   child: Text(
-                    'VIEW REPORTS',
+                    AppLocale.getText(AppLocale.viewReports, widget.languageCode),
                     style: TextStyle(
                       color: Colors.blue.shade700,
                       fontWeight: FontWeight.bold,
@@ -109,7 +114,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
                 Expanded(
                   child: TextField(
                     decoration: InputDecoration(
-                      hintText: 'Search Items',
+                      hintText: AppLocale.getText(AppLocale.searchItems, widget.languageCode),
                       prefixIcon: const Icon(Icons.search),
                       filled: true,
                       fillColor: Colors.grey.shade200,
@@ -156,7 +161,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
         onPressed: () async {
           final result = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const AddItemScreen()),
+            MaterialPageRoute(builder: (context) => AddItemScreen(languageCode: widget.languageCode)),
           );
 
           if (result != null) {
@@ -174,7 +179,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
             });
           }
         },
-        label: const Text("ADD PRODUCT", style: TextStyle(color: Colors.white)),
+        label: Text(AppLocale.getText(AppLocale.addProduct, widget.languageCode), style: const TextStyle(color: Colors.white)),
         icon: const Icon(Icons.add_box, color: Colors.white),
         backgroundColor: Colors.blue,
       ),
@@ -239,7 +244,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
 
             // Item details and stock information
             Expanded(
-                child:  Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -252,11 +257,11 @@ class _ItemsScreenState extends State<ItemsScreen> {
                     const SizedBox(height: 4),
                     Text.rich(
                       TextSpan(
-                        text: "Sale Price: ",
-                        style: TextStyle(fontWeight: FontWeight.bold,),
+                        text: AppLocale.getText(AppLocale.salePrice, widget.languageCode),
+                        style: TextStyle(fontWeight: FontWeight.bold),
                         children: [
                           TextSpan(
-                            text: "₹$salePrice",
+                            text: " ₹$salePrice",
                             style: TextStyle(fontWeight: FontWeight.normal),
                           ),
                         ],
@@ -264,11 +269,11 @@ class _ItemsScreenState extends State<ItemsScreen> {
                     ),
                     Text.rich(
                       TextSpan(
-                        text: "Purchase Price: ",
+                        text: AppLocale.getText(AppLocale.purchasePrice, widget.languageCode),
                         style: TextStyle(fontWeight: FontWeight.bold),
                         children: [
                           TextSpan(
-                            text: "₹$purchasePrice",
+                            text: " ₹$purchasePrice",
                             style: TextStyle(fontWeight: FontWeight.normal),
                           ),
                         ],
@@ -277,11 +282,11 @@ class _ItemsScreenState extends State<ItemsScreen> {
                     const SizedBox(height: 4),
                     Text.rich(
                       TextSpan(
-                        text: "Opening Stock: ",
+                        text: AppLocale.getText(AppLocale.openingStock, widget.languageCode),
                         style: TextStyle(fontWeight: FontWeight.bold),
                         children: [
                           TextSpan(
-                            text: "$openingStock",
+                            text: " $openingStock",
                             style: TextStyle(fontWeight: FontWeight.normal),
                           ),
                         ],
@@ -289,11 +294,11 @@ class _ItemsScreenState extends State<ItemsScreen> {
                     ),
                     Text.rich(
                       TextSpan(
-                        text: "Low Stock Alert: ",
+                        text: AppLocale.getText(AppLocale.lowStockAlert, widget.languageCode),
                         style: TextStyle(fontWeight: FontWeight.bold),
                         children: [
                           TextSpan(
-                            text: "$lowStockAlert",
+                            text: " $lowStockAlert",
                             style: TextStyle(fontWeight: FontWeight.normal),
                           ),
                         ],
@@ -301,11 +306,11 @@ class _ItemsScreenState extends State<ItemsScreen> {
                     ),
                     Text.rich(
                       TextSpan(
-                        text: "Date: ",
+                        text: AppLocale.getText(AppLocale.date, widget.languageCode),
                         style: TextStyle(fontWeight: FontWeight.bold),
                         children: [
                           TextSpan(
-                            text: "$selectedDate",
+                            text: " $selectedDate",
                             style: TextStyle(fontWeight: FontWeight.normal),
                           ),
                         ],
@@ -313,7 +318,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "Stock: $stock",
+                      AppLocale.getText(AppLocale.stock, widget.languageCode) + ": $stock",
                       style: TextStyle(
                         color: stock == 0 ? Colors.red : Colors.green,
                         fontWeight: FontWeight.w500,
@@ -337,7 +342,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
                     children: [
                       Icon(Icons.add, color: Colors.green.shade700, size: 14),
                       const SizedBox(width: 4), // Add spacing between icon and text
-                      Text("In", style: TextStyle(color: Colors.green.shade700)),
+                      Text(AppLocale.getText(AppLocale.inStockStatus, widget.languageCode), style: TextStyle(color: Colors.green.shade700)),
                     ],
                   ),
                 ),
@@ -349,17 +354,15 @@ class _ItemsScreenState extends State<ItemsScreen> {
                   ),
                   onPressed: () => _decreaseStock(index),
                   child: Row(
-                    //mainAxisSize: MainAxisSize.min, // Prevent Row from taking full width
                     children: [
                       Icon(Icons.remove, color: Colors.red.shade700 , size: 14,),
                       const SizedBox(width: 0), // Add spacing between icon and text
-                      Text("Out", style: TextStyle(color: Colors.red.shade700)),
+                      Text(AppLocale.getText(AppLocale.outOfStockStatus, widget.languageCode), style: TextStyle(color: Colors.red.shade700)),
                     ],
                   ),
                 ),
               ],
             )
-
           ],
         ),
       ),

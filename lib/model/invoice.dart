@@ -17,7 +17,6 @@ class Invoice {
     required this.items,
   });
 }
-
 class InvoiceInfo {
   final String description;
   final String number;
