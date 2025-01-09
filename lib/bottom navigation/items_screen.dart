@@ -1,15 +1,18 @@
-import 'dart:io'; // For using Image.file
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:khataboook/bottom%20navigation/AddItemScreen.dart';
-import '../I10n/app_locale.dart'; // Import for localization
+import '../I10n/app_locale.dart';
 
 class ItemsScreen extends StatefulWidget {
   final String languageCode;
 
   const ItemsScreen({
     super.key,
-    required this.languageCode, required String itemName, required String salePrice, required String purchasePrice,
+    required this.languageCode,
+    required String itemName,
+    required String salePrice,
+    required String purchasePrice,
   });
 
   @override
@@ -18,9 +21,8 @@ class ItemsScreen extends StatefulWidget {
 
 class _ItemsScreenState extends State<ItemsScreen> {
   List<Map<String, dynamic>> items = [];
-  final ImagePicker _picker = ImagePicker();  // ImagePicker instance
+  final ImagePicker _picker = ImagePicker();
 
-  // Function to add item to the list
   void _addItem(String itemName, String salePrice, String purchasePrice, String photo, String openingStock, String lowStockAlert, String selectedDate) {
     setState(() {
       items.add({
@@ -31,19 +33,17 @@ class _ItemsScreenState extends State<ItemsScreen> {
         'openingStock': openingStock,
         'lowStockAlert': lowStockAlert,
         'selectedDate': selectedDate,
-        'stock': 0, // Initialize stock to 0
+        'stock': 0,
       });
     });
   }
 
-  // Function to increase stock
   void _increaseStock(int index) {
     setState(() {
       items[index]['stock']++;
     });
   }
 
-  // Function to decrease stock
   void _decreaseStock(int index) {
     setState(() {
       if (items[index]['stock'] > 0) {
@@ -52,12 +52,11 @@ class _ItemsScreenState extends State<ItemsScreen> {
     });
   }
 
-  // Function to capture or pick an image
   Future<void> _pickImage(int index) async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera);  // You can change this to ImageSource.gallery to pick from gallery
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       setState(() {
-        items[index]['photo'] = pickedFile.path;  // Save the image path to the photo field
+        items[index]['photo'] = pickedFile.path;
       });
     }
   }
@@ -75,25 +74,20 @@ class _ItemsScreenState extends State<ItemsScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () {}, // Settings functionality
+            onPressed: () {},
           ),
         ],
       ),
       body: Column(
         children: [
-          // Top Stats Section
           Container(
             padding: const EdgeInsets.symmetric(vertical: 12),
             color: Colors.blue.shade100,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                //_buildStatCard('₹0', AppLocale.getText(AppLocale.totalStockValue, widget.languageCode)),
-                //_buildStatCard('0', AppLocale.getText(AppLocale.lowStockItems, widget.languageCode)),
                 GestureDetector(
-                  onTap: () {
-                    // Navigate to Reports
-                  },
+                  onTap: () {},
                   child: Text(
                     AppLocale.getText(AppLocale.viewReports, widget.languageCode),
                     style: TextStyle(
@@ -106,7 +100,6 @@ class _ItemsScreenState extends State<ItemsScreen> {
             ),
           ),
           const SizedBox(height: 10),
-          // Search & Sort Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
@@ -128,13 +121,12 @@ class _ItemsScreenState extends State<ItemsScreen> {
                 const SizedBox(width: 8),
                 IconButton(
                   icon: const Icon(Icons.filter_list, color: Colors.blue),
-                  onPressed: () {}, // Sorting functionality
+                  onPressed: () {},
                 ),
               ],
             ),
           ),
           const SizedBox(height: 10),
-          // Item List Section
           Expanded(
             child: ListView.builder(
               itemCount: items.length,
@@ -155,7 +147,6 @@ class _ItemsScreenState extends State<ItemsScreen> {
           ),
         ],
       ),
-      // Floating Action Button
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
@@ -174,35 +165,18 @@ class _ItemsScreenState extends State<ItemsScreen> {
                 'openingStock': result['openingStock'],
                 'lowStockAlert': result['lowStockAlert'],
                 'selectedDate': result['selectedDate'],
-                'stock': 0,  // Initialize stock to 0 for new items
+                'stock': 0,
               });
             });
           }
         },
-        label: Text(AppLocale.getText(AppLocale.addProduct, widget.languageCode), style: const TextStyle(color: Colors.white)),
+        label: Text(
+            AppLocale.getText(AppLocale.addProduct, widget.languageCode),
+            style: const TextStyle(color: Colors.white)
+        ),
         icon: const Icon(Icons.add_box, color: Colors.white),
         backgroundColor: Colors.blue,
       ),
-    );
-  }
-
-  Widget _buildStatCard(String value, String label) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.blue,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12, color: Colors.black54),
-        ),
-      ],
     );
   }
 
@@ -225,139 +199,140 @@ class _ItemsScreenState extends State<ItemsScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       color: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0), // Reduced padding
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start, // Aligning items to the top
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image on the left (Circle Avatar)
             GestureDetector(
-              onTap: () => _pickImage(index), // Allow tapping to change image
+              onTap: () => _pickImage(index),
               child: CircleAvatar(
                 backgroundColor: Colors.blue.shade100,
-                radius: 30, // Reduced size
+                radius: 30,
                 child: photo.isNotEmpty
-                    ? Image.file(File(photo), fit: BoxFit.cover) // Display the image if it's available
-                    : const Icon(Icons.inventory, color: Colors.blue), // Default icon if no photo
+                    ? Image.file(File(photo), fit: BoxFit.cover)
+                    : const Icon(Icons.inventory, color: Colors.blue),
               ),
             ),
-            const SizedBox(width: 12), // Reduced space between image and text
-
-            // Item details and stock information
+            const SizedBox(width: 12),
             Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      itemName,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    itemName,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(height: 4),
-                    Text.rich(
-                      TextSpan(
-                        text: AppLocale.getText(AppLocale.salePrice, widget.languageCode),
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                        children: [
-                          TextSpan(
-                            text: " ₹$salePrice",
-                            style: TextStyle(fontWeight: FontWeight.normal),
-                          ),
-                        ],
-                      ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text.rich(
+                    TextSpan(
+                      text: AppLocale.getText(AppLocale.salePrice, widget.languageCode),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      children: [
+                        TextSpan(
+                          text: " ₹$salePrice",
+                          style: const TextStyle(fontWeight: FontWeight.normal),
+                        ),
+                      ],
                     ),
-                    Text.rich(
-                      TextSpan(
-                        text: AppLocale.getText(AppLocale.purchasePrice, widget.languageCode),
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                        children: [
-                          TextSpan(
-                            text: " ₹$purchasePrice",
-                            style: TextStyle(fontWeight: FontWeight.normal),
-                          ),
-                        ],
-                      ),
+                  ),
+                  Text.rich(
+                    TextSpan(
+                      text: AppLocale.getText(AppLocale.purchasePrice, widget.languageCode),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      children: [
+                        TextSpan(
+                          text: " ₹$purchasePrice",
+                          style: const TextStyle(fontWeight: FontWeight.normal),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
-                    Text.rich(
-                      TextSpan(
-                        text: AppLocale.getText(AppLocale.openingStock, widget.languageCode),
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                        children: [
-                          TextSpan(
-                            text: " $openingStock",
-                            style: TextStyle(fontWeight: FontWeight.normal),
-                          ),
-                        ],
-                      ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text.rich(
+                    TextSpan(
+                      text: AppLocale.getText(AppLocale.openingStock, widget.languageCode),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      children: [
+                        TextSpan(
+                          text: " $openingStock",
+                          style: const TextStyle(fontWeight: FontWeight.normal),
+                        ),
+                      ],
                     ),
-                    Text.rich(
-                      TextSpan(
-                        text: AppLocale.getText(AppLocale.lowStockAlert, widget.languageCode),
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                        children: [
-                          TextSpan(
-                            text: " $lowStockAlert",
-                            style: TextStyle(fontWeight: FontWeight.normal),
-                          ),
-                        ],
-                      ),
+                  ),
+                  Text.rich(
+                    TextSpan(
+                      text: AppLocale.getText(AppLocale.lowStockAlert, widget.languageCode),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      children: [
+                        TextSpan(
+                          text: " $lowStockAlert",
+                          style: const TextStyle(fontWeight: FontWeight.normal),
+                        ),
+                      ],
                     ),
-                    Text.rich(
-                      TextSpan(
-                        text: AppLocale.getText(AppLocale.date, widget.languageCode),
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                        children: [
-                          TextSpan(
-                            text: " $selectedDate",
-                            style: TextStyle(fontWeight: FontWeight.normal),
-                          ),
-                        ],
-                      ),
+                  ),
+                  Text.rich(
+                    TextSpan(
+                      text: AppLocale.getText(AppLocale.date, widget.languageCode),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      children: [
+                        TextSpan(
+                          text: " $selectedDate",
+                          style: const TextStyle(fontWeight: FontWeight.normal),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      AppLocale.getText(AppLocale.stock, widget.languageCode) + ": $stock",
-                      style: TextStyle(
-                        color: stock == 0 ? Colors.red : Colors.green,
-                        fontWeight: FontWeight.w500,
-                      ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "${AppLocale.getText(AppLocale.stock, widget.languageCode)}: $stock",
+                    style: TextStyle(
+                      color: stock == 0 ? Colors.red : Colors.green,
+                      fontWeight: FontWeight.w500,
                     ),
-                  ],
-                )
+                  ),
+                ],
+              ),
             ),
-
-            // In and Out buttons positioned to the top-right
             Column(
               children: [
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: Colors.green.shade700),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Adjust padding
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   ),
                   onPressed: () => _increaseStock(index),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min, // Prevent Row from taking full width
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.add, color: Colors.green.shade700, size: 14),
-                      const SizedBox(width: 4), // Add spacing between icon and text
-                      Text(AppLocale.getText(AppLocale.inStockStatus, widget.languageCode), style: TextStyle(color: Colors.green.shade700)),
+                      const SizedBox(width: 4),
+                      Text(
+                          AppLocale.getText(AppLocale.inStockStatus, widget.languageCode),
+                          style: TextStyle(color: Colors.green.shade700)
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 8),
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Colors.red.shade700,),
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), // Adjust padding
+                    side: BorderSide(color: Colors.red.shade700),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   ),
                   onPressed: () => _decreaseStock(index),
                   child: Row(
                     children: [
-                      Icon(Icons.remove, color: Colors.red.shade700 , size: 14,),
-                      const SizedBox(width: 0), // Add spacing between icon and text
-                      Text(AppLocale.getText(AppLocale.outOfStockStatus, widget.languageCode), style: TextStyle(color: Colors.red.shade700)),
+                      Icon(Icons.remove, color: Colors.red.shade700, size: 14),
+                      const SizedBox(width: 0),
+                      Text(
+                          AppLocale.getText(AppLocale.outOfStockStatus, widget.languageCode),
+                          style: TextStyle(color: Colors.red.shade700)
+                      ),
                     ],
                   ),
                 ),

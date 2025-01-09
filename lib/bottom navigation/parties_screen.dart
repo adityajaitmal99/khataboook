@@ -10,24 +10,7 @@ import 'bills_screen.dart';
 import 'items_screen.dart';
 import 'more_screen.dart';
 
-void main() {
-  runApp(const MyApp());
-}
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Home Screen',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const LanguageSelectionScreen(),
-    );
-  }
-}
 
 class LanguageSelectionScreen extends StatefulWidget {
   const LanguageSelectionScreen({super.key});
@@ -63,6 +46,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
         title: const Text('Select Language'),
       ),
@@ -165,10 +149,14 @@ class _PartiesScreenState extends State<PartiesScreen> {
     });
   }
 
-  Future<void> _addCustomer(BuildContext context) async {
+  void _addCustomer(BuildContext context) async {
     Contact? contact = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ContactsScreen(languageCode: '',)),
+      MaterialPageRoute(
+        builder: (context) => ContactsScreen(
+          languageCode: widget.languageCode,
+        ),
+      ),
     );
 
     if (contact != null) {
@@ -187,12 +175,12 @@ class _PartiesScreenState extends State<PartiesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_currentIndex],
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: _currentIndex == 0 ? FloatingActionButton.extended(
         onPressed: () => _addCustomer(context),
         icon: const Icon(Icons.person_add),
         label: Text(AppLocale.getText(AppLocale.addCustomer, widget.languageCode)),
         backgroundColor: Colors.blue,
-      ),
+      ) : null,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: _onTabTapped,
@@ -240,6 +228,7 @@ class PartiesScreenContent extends StatelessWidget {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: Colors.blue,
           title: Row(
@@ -266,7 +255,7 @@ class PartiesScreenContent extends StatelessWidget {
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white70,
             tabs: [
-              Tab(text: AppLocale.getText(AppLocale.customers, languageCode)),
+              Tab(text: AppLocale.getText(AppLocale.customers, languageCode) ),
               Tab(text: AppLocale.getText(AppLocale.suppliers, languageCode)),
             ],
           ),
@@ -341,25 +330,6 @@ class PartiesScreenContent extends StatelessWidget {
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () async {
-            final result = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AddPartyScreen(
-                  contact: selectedContacts.isNotEmpty ? selectedContacts.last : null, languageCode: 'mr',
-                ),
-              ),
-            );
-
-            if (result != null) {
-              print('New contact added: ${result['name']}, ${result['phone']}, ${result['address']}');
-            }
-          },
-          icon: const Icon(Icons.person_add),
-          label: Text(AppLocale.getText(AppLocale.addCustomer, languageCode)),
-          backgroundColor: Colors.blue,
-        ),
       ),
     );
   }
@@ -374,7 +344,7 @@ class PartiesScreenContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(phone),
-          if (address.isNotEmpty) Text(address, style: TextStyle(fontSize: 12)),
+          if (address.isNotEmpty) Text(address, style: const TextStyle(fontSize: 12)),
         ],
       ),
       trailing: Text(
@@ -389,7 +359,7 @@ class PartiesScreenContent extends StatelessWidget {
               languageCode: languageCode,
               name: name,
               number: phone,
-              address: address, // Pass the address here
+              address: address,
               timeAgo: AppLocale.getText(AppLocale.recentTransactions, languageCode),
               amountColor: color,
             ),
@@ -398,4 +368,4 @@ class PartiesScreenContent extends StatelessWidget {
       },
     );
   }
-  }
+}

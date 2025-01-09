@@ -6,9 +6,12 @@ import '../model/invoice.dart';
 import '../model/supplier.dart';
 import '../widget/button_widget.dart';
 import '../widget/title_widget.dart';
+import '../I10n/app_locale.dart';
 
 class PdfPage extends StatefulWidget {
-  const PdfPage({super.key});
+  final String languageCode;
+
+  const PdfPage({super.key, required this.languageCode});
 
   @override
   _PdfPageState createState() => _PdfPageState();
@@ -45,7 +48,7 @@ class _PdfPageState extends State<PdfPage> {
     return Scaffold(
       backgroundColor: Colors.blue.shade50,
       appBar: AppBar(
-        title: const Text('Generate Invoice'),
+        title: Text(AppLocale.getText(AppLocale.generateInvoice, widget.languageCode)),
         backgroundColor: Colors.blue,
         elevation: 4,
       ),
@@ -53,9 +56,9 @@ class _PdfPageState extends State<PdfPage> {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            const TitleWidget(
+            TitleWidget(
               icon: Icons.picture_as_pdf,
-              text: 'Generate Invoice',
+              text: AppLocale.getText(AppLocale.generateInvoice, widget.languageCode),
               iconColor: Colors.blue,
             ),
             const SizedBox(height: 32),
@@ -64,21 +67,21 @@ class _PdfPageState extends State<PdfPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionTitle('Supplier Details'),
-                  _buildTextField(_supplierNameController, 'Supplier Name'),
-                  _buildTextField(_supplierAddressController, 'Supplier Address'),
+                  _buildSectionTitle(AppLocale.getText(AppLocale.supplierDetails, widget.languageCode)),
+                  _buildTextField(_supplierNameController, AppLocale.getText(AppLocale.supplierName, widget.languageCode)),
+                  _buildTextField(_supplierAddressController, AppLocale.getText(AppLocale.supplierAddress, widget.languageCode)),
                   const SizedBox(height: 16),
-                  _buildSectionTitle('Customer Details'),
-                  _buildTextField(_customerNameController, 'Customer Name'),
-                  _buildTextField(_customerPhoneController, 'Customer Phone', keyboardType: TextInputType.phone),
+                  _buildSectionTitle(AppLocale.getText(AppLocale.customerDetails, widget.languageCode)),
+                  _buildTextField(_customerNameController, AppLocale.getText(AppLocale.customerName, widget.languageCode)),
+                  _buildTextField(_customerPhoneController, AppLocale.getText(AppLocale.customerPhone, widget.languageCode), keyboardType: TextInputType.phone),
                   const SizedBox(height: 16),
-                  _buildSectionTitle('Item Details'),
+                  _buildSectionTitle(AppLocale.getText(AppLocale.itemDetails, widget.languageCode)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Add Item',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      Text(
+                        AppLocale.getText(AppLocale.addItem, widget.languageCode),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       IconButton(
                         icon: Icon(
@@ -94,9 +97,9 @@ class _PdfPageState extends State<PdfPage> {
                     ],
                   ),
                   if (isItemFormVisible) ...[
-                    _buildTextField(_itemDescriptionController, 'Item Description'),
-                    _buildTextField(_itemQuantityController, 'Quantity', keyboardType: TextInputType.number),
-                    _buildTextField(_itemUnitPriceController, 'Unit Price', keyboardType: TextInputType.number),
+                    _buildTextField(_itemDescriptionController, AppLocale.getText(AppLocale.itemDescription, widget.languageCode)),
+                    _buildTextField(_itemQuantityController, AppLocale.getText(AppLocale.quantity, widget.languageCode), keyboardType: TextInputType.number),
+                    _buildTextField(_itemUnitPriceController, AppLocale.getText(AppLocale.unitPrice, widget.languageCode), keyboardType: TextInputType.number),
                     const SizedBox(height: 8),
                     ElevatedButton(
                       onPressed: () {
@@ -105,7 +108,8 @@ class _PdfPageState extends State<PdfPage> {
                             description: _itemDescriptionController.text,
                             date: DateTime.now(),
                             quantity: int.tryParse(_itemQuantityController.text) ?? 1,
-                            unitPrice: double.tryParse(_itemUnitPriceController.text) ?? 0.0, vat: 0.0,
+                            unitPrice: double.tryParse(_itemUnitPriceController.text) ?? 0.0,
+                            vat: 0.0,
                           );
                           setState(() {
                             items.add(item);
@@ -121,12 +125,12 @@ class _PdfPageState extends State<PdfPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: const Text('Add Item'),
+                      child: Text(AppLocale.getText(AppLocale.addItem, widget.languageCode)),
                     ),
                   ],
                   const SizedBox(height: 16),
                   if (items.isNotEmpty) ...[
-                    _buildSectionTitle('Added Items'),
+                    _buildSectionTitle(AppLocale.getText(AppLocale.addedItems, widget.languageCode)),
                     Column(
                       children: items.asMap().entries.map((entry) {
                         final item = entry.value;
@@ -134,7 +138,7 @@ class _PdfPageState extends State<PdfPage> {
                           margin: const EdgeInsets.symmetric(vertical: 8),
                           child: ListTile(
                             title: Text(item.description),
-                            subtitle: Text('Qty: ${item.quantity}, Price: ${item.unitPrice}'),
+                            subtitle: Text('${AppLocale.getText(AppLocale.quantity, widget.languageCode)}: ${item.quantity}, ${AppLocale.getText(AppLocale.price, widget.languageCode)}: ${item.unitPrice}'),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () {
@@ -159,9 +163,9 @@ class _PdfPageState extends State<PdfPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: const Text(
-                        'Generate PDF',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      child: Text(
+                        AppLocale.getText(AppLocale.generatePdf, widget.languageCode),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -189,7 +193,7 @@ class _PdfPageState extends State<PdfPage> {
         ),
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'Please enter $label';
+            return AppLocale.getText(AppLocale.pleaseEnter, widget.languageCode) + ' $label';
           }
           return null;
         },
@@ -218,12 +222,14 @@ class _PdfPageState extends State<PdfPage> {
         ),
         customer: Customer(
           name: _customerNameController.text,
-          phone: _customerPhoneController.text, address: '',
+          phone: _customerPhoneController.text,
+          address: '',
         ),
         info: InvoiceInfo(
           date: date,
-          description: 'Invoice Description',
-          number: 'INV-${invoiceNumber++}', dueDate: date.add(const Duration(days: 7)),
+          description: AppLocale.getText(AppLocale.invoiceDescription, widget.languageCode),
+          number: 'INV-${invoiceNumber++}',
+          dueDate: date.add(const Duration(days: 7)),
         ),
         items: items,
       );

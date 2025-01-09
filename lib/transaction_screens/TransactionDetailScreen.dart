@@ -11,7 +11,7 @@ class TransactionDetailScreen extends StatefulWidget {
   final String timeAgo;
   final Color amountColor;
   final String languageCode;
-  final String? address; // New address parameter
+  final String? address;
 
   const TransactionDetailScreen({
     Key? key,
@@ -20,7 +20,7 @@ class TransactionDetailScreen extends StatefulWidget {
     required this.timeAgo,
     required this.amountColor,
     required this.languageCode,
-    this.address, // Optional address parameter
+    this.address,
   }) : super(key: key);
 
   @override
@@ -231,6 +231,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                       builder: (context) => TransactionScreen(
                         name: widget.name,
                         isGave: true,
+                        languageCode: widget.languageCode,
                       ),
                     ),
                   );
@@ -266,6 +267,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                       builder: (context) => TransactionScreenn(
                         name: widget.name,
                         isGave: false,
+                        languageCode: widget.languageCode,
                       ),
                     ),
                   );

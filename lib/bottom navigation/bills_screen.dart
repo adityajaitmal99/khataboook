@@ -13,9 +13,11 @@ class BillsScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.blue,
-        title: Text(AppLocale.getText(AppLocale.title, languageCode)), // Localized app title
+        title: Text(AppLocale.getText(AppLocale.title, languageCode)),
+        // Localized app title
         actions: [
-          IconButton(icon: const Icon(Icons.settings), onPressed: () {}), // Settings icon
+          IconButton(icon: const Icon(Icons.settings), onPressed: () {}),
+          // Settings icon
         ],
       ),
       body: Column(
@@ -29,7 +31,8 @@ class BillsScreen extends StatelessWidget {
           Expanded(
             child: Center(
               child: Text(
-                AppLocale.getText(AppLocale.noCustomers, languageCode), // Localized "No bills available"
+                AppLocale.getText(AppLocale.noCustomers, languageCode),
+                // Localized "No bills available"
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ),
@@ -43,9 +46,9 @@ class BillsScreen extends StatelessWidget {
 
   Widget _buildTopStatsSection() {
     return Container(
-     // padding: const EdgeInsets.symmetric(vertical: 16.0),
+      // padding: const EdgeInsets.symmetric(vertical: 16.0),
       //color: Colors.blue.shade50,
-     /* child: Row(
+      /* child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildStatCard('₹0', AppLocale.getText(AppLocale.monthlySales, languageCode), Colors.green),
@@ -62,7 +65,8 @@ class BillsScreen extends StatelessWidget {
       children: [
         Text(
           amount,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color),
+          style: TextStyle(
+              fontSize: 18, fontWeight: FontWeight.bold, color: color),
         ),
         const SizedBox(height: 4),
         Text(label, style: TextStyle(fontSize: 12, color: Colors.black54)),
@@ -76,7 +80,8 @@ class BillsScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildTab(AppLocale.getText(AppLocale.sale, languageCode), isSelected: true),
+          _buildTab(AppLocale.getText(AppLocale.sale, languageCode),
+              isSelected: true),
           _buildTab(AppLocale.getText(AppLocale.purchase, languageCode)),
           _buildTab(AppLocale.getText(AppLocale.expense, languageCode)),
         ],
@@ -115,7 +120,9 @@ class BillsScreen extends StatelessWidget {
           Expanded(
             child: TextField(
               decoration: InputDecoration(
-                hintText: AppLocale.getText(AppLocale.searchForTransactions, languageCode), // Localized search hint
+                hintText: AppLocale.getText(
+                    AppLocale.searchForTransactions, languageCode),
+                // Localized search hint
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
@@ -140,12 +147,13 @@ class BillsScreen extends StatelessWidget {
       onPressed: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const PdfPage()),
+          MaterialPageRoute(
+              builder: (context) => PdfPage(languageCode: languageCode)),
         );
       },
       icon: const Icon(Icons.add, color: Colors.white),
       label: Text(
-        AppLocale.getText(AppLocale.addBill, languageCode), // Localized "Add Bill"
+        AppLocale.getText(AppLocale.addBill, languageCode),
         style: const TextStyle(color: Colors.white),
       ),
       backgroundColor: Colors.blue,

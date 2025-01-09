@@ -3,14 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../model/TransactionDetails.dart';
-
+import '../I10n/app_locale.dart';
 
 class TransactionScreen extends StatefulWidget {
   final String name;
+  final String languageCode;
 
   const TransactionScreen({
     super.key,
-    required this.name, required bool isGave,
+    required this.name,
+    required bool isGave,
+    required this.languageCode,
   });
 
   @override
@@ -42,7 +45,9 @@ class _TransactionScreenState extends State<TransactionScreen> {
   void _saveTransaction() {
     if (_amountController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter an amount!")),
+        SnackBar(
+          content: Text(AppLocale.getText(AppLocale.pleaseEnterAmount, widget.languageCode)),
+        ),
       );
       return;
     }
@@ -51,7 +56,9 @@ class _TransactionScreenState extends State<TransactionScreen> {
       amount: double.parse(_amountController.text),
       details: _detailsController.text,
       date: _selectedDate,
-      attachedBill: _image, isGave: true, isGot: false,
+      attachedBill: _image,
+      isGave: true,
+      isGot: false,
     );
 
     Navigator.pop(context, transactionDetails);
@@ -62,7 +69,9 @@ class _TransactionScreenState extends State<TransactionScreen> {
       final permissionStatus = await Permission.camera.request();
       if (!permissionStatus.isGranted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Camera permission denied")),
+          SnackBar(
+            content: Text(AppLocale.getText(AppLocale.cameraPermissionDenied, widget.languageCode)),
+          ),
         );
         return;
       }
@@ -165,7 +174,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("You gave ₹ to ${widget.name}"),
+        title: Text("${AppLocale.getText(AppLocale.youGaveTo, widget.languageCode)} ${widget.name}"),
         backgroundColor: Colors.red,
       ),
       body: GestureDetector(
@@ -184,7 +193,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                   keyboardType: TextInputType.none,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.currency_rupee, color: Colors.red),
-                    hintText: "Enter Amount",
+                    hintText: AppLocale.getText(AppLocale.enterAmount, widget.languageCode),
                     filled: true,
                     fillColor: Colors.grey[200],
                     border: OutlineInputBorder(
@@ -198,7 +207,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
               TextField(
                 controller: _detailsController,
                 decoration: InputDecoration(
-                  hintText: "Enter details (Items, bill no., quantity, etc.)",
+                  hintText: AppLocale.getText(AppLocale.enterDetails, widget.languageCode),
                   filled: true,
                   fillColor: Colors.grey[200],
                   border: OutlineInputBorder(
@@ -234,7 +243,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                   ElevatedButton.icon(
                     onPressed: _pickImage,
                     icon: const Icon(Icons.camera_alt, color: Colors.red),
-                    label: const Text("Attach bills"),
+                    label: Text(AppLocale.getText(AppLocale.attachBills, widget.languageCode)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.blue,
@@ -264,7 +273,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),
-                child: const Text("SAVE"),
+                child: Text(AppLocale.getText(AppLocale.save, widget.languageCode)),
               ),
               const SizedBox(height: 10),
             ],

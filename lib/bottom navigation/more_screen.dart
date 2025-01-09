@@ -181,9 +181,33 @@ class _MoreScreenState extends State<MoreScreen> {
           const SizedBox(height: 20),
 
           // Footer Section
-          const SizedBox(height: 250),
+          const SizedBox(height: 150),
 
           // Footer Section
+
+
+
+          // Logout Button Section
+          if (_currentUser != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: ElevatedButton(
+                onPressed: _logout,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  AppLocale.getText(AppLocale.logout, languageCode),
+                  style: const TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+
+            ),
+          const SizedBox(height: 20),
           Center(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -201,28 +225,8 @@ class _MoreScreenState extends State<MoreScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
-
-          // Logout Button Section
-          if (_currentUser != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: ElevatedButton(
-                onPressed: _logout,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: Text(
-                  AppLocale.getText(AppLocale.logout, languageCode),
-                  style: const TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
-            ),
         ],
+
       ),
     );
   }

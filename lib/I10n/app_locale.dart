@@ -95,6 +95,48 @@ class AppLocale {
   static const String  nameRequired = 'Please Enter party name';
   static const String  phoneRequired = 'Please Enter phone number';
   static const String  invalidPhone = 'Mobile number is not valid';
+  static const String selectContact = 'selectContact';
+  static const String searchContacts = 'searchContacts';
+  static const String noContactsFound = 'noContactsFound';
+  static const String noPhoneNumber = 'noPhoneNumber';
+  static const String permissionDenied = 'permissionDenied';
+  //you gave screen
+  static const String youGaveTo = 'youGaveTo';
+  static const String enterAmount = 'enterAmount';
+  static const String enterDetails = 'enterDetails';
+  static const String attachBills = 'attachBills';
+  static const String save = 'save';
+  static const String pleaseEnterAmount = 'pleaseEnterAmount';
+  static const String cameraPermissionDenied = 'cameraPermissionDenied';
+  static const String youGot = 'You Got';
+  //pdf screen
+  static const String generateInvoice = 'generateInvoice';
+  static const String supplierDetails = 'supplierDetails';
+  static const String supplierName = 'supplierName';
+  static const String supplierAddress = 'supplierAddress';
+  static const String customerDetails = 'customerDetails';
+  static const String customerName = 'customerName';
+  static const String customerPhone = 'customerPhone';
+  static const String itemDetails = 'itemDetails';
+  static const String addItem = 'addItem';
+  static const String itemDescription = 'itemDescription';
+  static const String quantity = 'quantity';
+  static const String unitPrice = 'unitPrice';
+  static const String addedItems = 'addedItems';
+  static const String price = 'price';
+  static const String generatePdf = 'generatePdf';
+  static const String pleaseEnter = 'pleaseEnter';
+  static const String invoiceDescription = 'invoiceDescription';
+
+  //addditem
+  static const String uploadPhoto = 'uploadPhoto';
+  static const String itemName = 'itemName';
+  static const String saveItem = 'saveItem';
+  static const String camera_permission_required = 'camera_permission_required';
+  static const String please_fill_fields = 'please_fill_fields';
+  static const String enterItemName = 'enterItemName';
+  static const String capturePhoto = 'capturePhoto';
+
   /// English Translations (Default Language)
   static const Map<String, String> EN = {
     // Common
@@ -190,6 +232,12 @@ class AppLocale {
     phoneRequired: 'Please Enter phone number',
     invalidPhone: 'Mobile number is not valid',
     nameRequired: 'Please Enter party name',
+
+    selectContact: 'Select Contact',
+    searchContacts: 'Search Contacts',
+    noContactsFound: 'No Contacts Found',
+    noPhoneNumber: 'No Phone Number',
+    permissionDenied: 'Permission denied to access contacts',
     //transaction detail screen
     'transactionDetails': 'Transaction Details',
     'youGave': 'YOU GAVE ₹',
@@ -207,6 +255,42 @@ class AppLocale {
     'save': 'Save',
     'cancel': 'Cancel',
     'Transactions:-': 'Transactions:-',
+    //you gave screen
+    youGaveTo: 'You gave ₹ to',
+
+    enterDetails: 'Enter details (Items, bill no., quantity, etc.)',
+    attachBills: 'Attach bills',
+
+    pleaseEnterAmount: 'Please enter an amount!',
+    cameraPermissionDenied: 'Camera permission denied',
+
+    //pdf screen
+    generateInvoice: 'Generate Invoice',
+    supplierDetails: 'Supplier Details',
+    supplierName: 'Supplier Name',
+    supplierAddress: 'Supplier Address',
+    customerDetails: 'Customer Details',
+    customerName: 'Customer Name',
+    customerPhone: 'Customer Phone',
+    itemDetails: 'Item Details',
+    addItem: 'Add Item',
+    itemDescription: 'Item Description',
+    quantity: 'Quantity',
+    unitPrice: 'Unit Price',
+    addedItems: 'Added Items',
+    price: 'Price',
+    generatePdf: 'Generate PDF',
+    pleaseEnter: 'Please enter',
+    invoiceDescription: 'Invoice Description',
+
+    //addd item
+    uploadPhoto: 'Upload Photo',
+    saveItem: 'Save Item',
+    itemName: 'Item Name',
+    camera_permission_required: 'Camera permission is required',
+    please_fill_fields: 'Please fill in all required fields',
+    enterItemName: 'Enter item name',
+    capturePhoto: 'Capture Photo',
   };
 
   /// Marathi Translations
@@ -325,6 +409,49 @@ class AppLocale {
     'save': 'जतन करा',
     'cancel': 'रद्द करा',
     'Transactions:-': 'व्यवहार:-',
+
+    selectContact: 'संपर्क निवडा',
+    searchContacts: 'संपर्क शोधा',
+    noContactsFound: 'कोणतेही संपर्क सापडले नाहीत',
+    noPhoneNumber: 'फोन नंबर नाही',
+    permissionDenied: 'संपर्क अॅक्सेस करण्यासाठी परवानगी नाकारली',
+
+    //yougave screen
+    youGaveTo: 'तुम्ही दिले ₹',
+    youGot: 'तुम्हाला मिळाले ₹',
+
+    enterDetails: 'तपशील टाका (वस्तू, बिल क्र., संख्या, इ.)',
+    attachBills: 'बिल जोडा',
+
+    pleaseEnterAmount: 'कृपया रक्कम टाका!',
+    cameraPermissionDenied: 'कॅमेरा परवानगी नाकारली',
+    //pdf screen
+    generateInvoice: 'चलन तयार करा',
+    supplierDetails: 'पुरवठादार तपशील',
+    supplierName: 'पुरवठादाराचे नाव',
+    supplierAddress: 'पुरवठादाराचा पत्ता',
+    customerDetails: 'ग्राहक तपशील',
+    customerName: 'ग्राहकाचे नाव',
+    customerPhone: 'ग्राहक फोन',
+    itemDetails: 'वस्तू तपशील',
+    addItem: 'वस्तू जोडा',
+    itemDescription: 'वस्तू वर्णन',
+    quantity: 'संख्या',
+    unitPrice: 'एकक किंमत',
+    addedItems: 'जोडलेल्या वस्तू',
+    price: 'किंमत',
+    generatePdf: 'पीडीएफ तयार करा',
+    pleaseEnter: 'कृपया प्रविष्ट करा',
+    invoiceDescription: 'चलन वर्णन',
+    //add item
+    uploadPhoto: 'फोटो अपलोड करा',
+    saveItem: 'वस्तू जतन करा',
+    itemName: 'वस्तूचे नाव',
+    camera_permission_required: 'कॅमेरा परवानगी आवश्यक आहे',
+    please_fill_fields: 'कृपया सर्व आवश्यक माहिती भरा',
+    enterItemName: 'वस्तूचे नाव टाका',
+    capturePhoto: 'फोटो काढा',
+
   };
 
   /// Get localized text based on the current language
